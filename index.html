@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hillary the Shark - Advanced Poker AI</title>
+    <title>Hillary the Shark - Poker Arena</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
@@ -32,6 +32,12 @@
         .log-entry { border-left: 3px solid #3b82f6; padding-left: 12px; margin: 4px 0; font-size: 0.875rem; animation: slideIn 0.3s ease; }
         @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
         .chip { width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); border: 2px solid #92400e; box-shadow: 0 2px 4px rgba(0,0,0,0.3); display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: #78350f; }
+        .player-avatar { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; border: 3px solid; }
+        .player-hillary { background: linear-gradient(135deg, #3b82f6, #8b5cf6); border-color: #60a5fa; }
+        .player-gentuu { background: linear-gradient(135deg, #10b981, #059669); border-color: #34d399; }
+        .player-mohammed { background: linear-gradient(135deg, #f59e0b, #d97706); border-color: #fbbf24; }
+        .player-you { background: linear-gradient(135deg, #ef4444, #dc2626); border-color: #f87171; }
+        #evChart { max-height: 128px !important; }
     </style>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900">
@@ -43,17 +49,13 @@
             <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center font-bold text-xl shadow-lg">🦈</div>
             <div>
                 <h1 class="font-bold text-lg tracking-tight bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Hillary the Shark</h1>
-                <p class="text-xs text-slate-400 mono">Advanced Poker Intelligence System</p>
+                <p class="text-xs text-slate-400 mono">vs Gentuu vs Mohammed Dev</p>
             </div>
         </div>
         <div class="flex gap-4 text-sm items-center">
             <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800/50 border border-slate-700">
                 <div class="w-2 h-2 bg-green-500 rounded-full pulse"></div>
                 <span class="text-slate-300 text-xs">Engine: <span class="mono text-green-400 font-bold">ONLINE</span></span>
-            </div>
-            <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800/50 border border-slate-700">
-                <div class="w-2 h-2 bg-purple-500 rounded-full"></div>
-                <span class="text-slate-300 text-xs">Mode: <span id="current-mode" class="mono text-purple-400 font-bold">GTO</span></span>
             </div>
             <button onclick="toggleAutoPlay()" id="auto-play-btn" class="px-4 py-1.5 bg-gradient-to-r from-orange-600 to-red-600 rounded-lg text-xs font-bold hover:from-orange-500 hover:to-red-500 transition btn-action">
                 🤖 Auto-Play: OFF
@@ -90,7 +92,7 @@
     <div id="session-game" class="session-content">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             
-            <!-- Left Panel: Game Controls -->
+            <!-- Left Panel -->
             <div class="lg:col-span-3 space-y-4">
                 <div class="glass rounded-xl p-5 border border-slate-700/50">
                     <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-blue-400">
@@ -101,19 +103,18 @@
                         <button onclick="game.newHand()" class="w-full py-3 bg-gradient-to-r from-blue-600 to-blue-500 rounded-lg font-bold text-white shadow-lg btn-action flex items-center justify-center gap-2">
                             <span>🎲</span> New Hand
                         </button>
-                        
                         <button onclick="game.simulateHand()" class="w-full py-3 bg-gradient-to-r from-purple-600 to-purple-500 rounded-lg font-bold text-white shadow-lg btn-action flex items-center justify-center gap-2">
-                            <span>⚡</span> Simulate vs AI
+                            <span>⚡</span> Simulate All AI
                         </button>
-                        
                         <button onclick="game.autoPlayHands(10)" class="w-full py-3 bg-gradient-to-r from-green-600 to-green-500 rounded-lg font-bold text-white shadow-lg btn-action flex items-center justify-center gap-2">
                             <span>▶</span> Burst Mode (10x)
                         </button>
-                        
                         <button onclick="game.autoPlayHands(100)" class="w-full py-3 bg-gradient-to-r from-orange-600 to-orange-500 rounded-lg font-bold text-white shadow-lg btn-action flex items-center justify-center gap-2">
                             <span>🔥</span> Mega Burst (100x)
                         </button>
-                        
+                        <button onclick="game.autoPlayHands(1000)" class="w-full py-3 bg-gradient-to-r from-red-600 to-red-500 rounded-lg font-bold text-white shadow-lg btn-action flex items-center justify-center gap-2">
+                            <span>💥</span> Ultra Burst (1000x)
+                        </button>
                         <button onclick="toggleSpeedMode()" id="speed-btn" class="w-full py-3 bg-slate-700 hover:bg-slate-600 rounded-lg font-bold text-white shadow-lg btn-action flex items-center justify-center gap-2">
                             <span>🚀</span> Speed: Normal
                         </button>
@@ -121,7 +122,6 @@
 
                     <div class="mt-6 pt-6 border-t border-slate-700">
                         <label class="text-xs text-slate-400 uppercase font-bold tracking-wider mb-3 block">Bot Intelligence</label>
-                        
                         <div class="space-y-4">
                             <div>
                                 <div class="flex justify-between text-xs mb-2">
@@ -130,7 +130,6 @@
                                 </div>
                                 <input type="range" min="0" max="100" value="70" class="slider" id="cfr-weight" oninput="updateStrategyMix('cfr', this.value)">
                             </div>
-                            
                             <div>
                                 <div class="flex justify-between text-xs mb-2">
                                     <span class="text-slate-400">DQN Weight</span>
@@ -138,7 +137,6 @@
                                 </div>
                                 <input type="range" min="0" max="100" value="30" class="slider" id="dqn-weight" oninput="updateStrategyMix('dqn', this.value)">
                             </div>
-                            
                             <div>
                                 <div class="flex justify-between text-xs mb-2">
                                     <span class="text-slate-400">Aggression</span>
@@ -150,7 +148,7 @@
                     </div>
                 </div>
 
-                <!-- Quick Stats - FIXED -->
+                <!-- Session Stats -->
                 <div class="glass rounded-xl p-5 border border-slate-700/50">
                     <h3 class="text-sm font-bold mb-3 text-slate-300">Session Stats</h3>
                     <div class="grid grid-cols-2 gap-3">
@@ -172,9 +170,48 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Player Rankings -->
+                <div class="glass rounded-xl p-5 border border-slate-700/50">
+                    <h3 class="text-sm font-bold mb-3 text-yellow-400">🏆 Live Rankings</h3>
+                    <div class="space-y-2" id="player-rankings">
+                        <div class="flex items-center gap-3 p-2 bg-slate-800/30 rounded-lg">
+                            <div class="player-avatar player-you" style="width: 32px; height: 32px; font-size: 16px;">🎯</div>
+                            <div class="flex-1">
+                                <div class="text-sm font-bold text-white">You</div>
+                                <div class="text-xs text-green-400">$<span id="rank-you">10000</span></div>
+                            </div>
+                            <div class="text-xs text-yellow-400 font-bold">#1</div>
+                        </div>
+                        <div class="flex items-center gap-3 p-2 bg-slate-800/30 rounded-lg">
+                            <div class="player-avatar player-hillary" style="width: 32px; height: 32px; font-size: 16px;">🦈</div>
+                            <div class="flex-1">
+                                <div class="text-sm font-bold text-blue-400">Hillary</div>
+                                <div class="text-xs text-slate-400">$<span id="rank-hillary">10000</span></div>
+                            </div>
+                            <div class="text-xs text-slate-500 font-bold">#2</div>
+                        </div>
+                        <div class="flex items-center gap-3 p-2 bg-slate-800/30 rounded-lg">
+                            <div class="player-avatar player-gentuu" style="width: 32px; height: 32px; font-size: 16px;">🐊</div>
+                            <div class="flex-1">
+                                <div class="text-sm font-bold text-green-400">Gentuu</div>
+                                <div class="text-xs text-slate-400">$<span id="rank-gentuu">10000</span></div>
+                            </div>
+                            <div class="text-xs text-slate-500 font-bold">#3</div>
+                        </div>
+                        <div class="flex items-center gap-3 p-2 bg-slate-800/30 rounded-lg">
+                            <div class="player-avatar player-mohammed" style="width: 32px; height: 32px; font-size: 16px;">🦁</div>
+                            <div class="flex-1">
+                                <div class="text-sm font-bold text-orange-400">Mohammed Dev</div>
+                                <div class="text-xs text-slate-400">$<span id="rank-mohammed">10000</span></div>
+                            </div>
+                            <div class="text-xs text-slate-500 font-bold">#4</div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <!-- Center: Poker Table - FIXED CARDS -->
+            <!-- Center: Poker Table -->
             <div class="lg:col-span-6">
                 <div class="felt rounded-2xl p-6 relative min-h-[600px] border-4 border-slate-800 shadow-2xl overflow-hidden">
                     
@@ -193,10 +230,9 @@
                         </div>
                     </div>
 
-                    <!-- Community Cards - FIXED DISPLAY -->
+                    <!-- Community Cards -->
                     <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 w-full max-w-md px-4">
                         <div class="flex justify-center gap-2 mb-4 flex-wrap" id="community-cards">
-                            <!-- Cards will be inserted here by JavaScript -->
                         </div>
                         <div class="text-center mt-2">
                             <span id="street-indicator" class="px-4 py-2 bg-slate-800/90 rounded-full text-sm font-bold text-blue-400 border border-blue-500/30 shadow-lg">
@@ -207,7 +243,6 @@
 
                     <!-- Players Container -->
                     <div id="players-container" class="absolute inset-0 z-10 pointer-events-none">
-                        <!-- Players positioned by JS -->
                     </div>
 
                     <!-- Action Buttons -->
@@ -243,7 +278,7 @@
                                 <div class="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
                                 <div class="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
                             </div>
-                            <span class="text-sm font-bold text-purple-400">🦈 Hillary is thinking...</span>
+                            <span class="text-sm font-bold text-purple-400" id="thinking-text">🦈 Hillary is thinking...</span>
                         </div>
                     </div>
                 </div>
@@ -255,15 +290,95 @@
                         <button onclick="clearLog()" class="text-xs text-slate-500 hover:text-slate-300">Clear</button>
                     </div>
                     <div id="game-log" class="flex-1 overflow-y-auto space-y-2 text-sm mono pr-2">
-                        <div class="text-slate-500 italic">🦈 Welcome to Hillary the Shark. Click "New Hand" to begin...</div>
+                        <div class="text-slate-500 italic">🦈 Hillary, 🐊 Gentuu, and 🦁 Mohammed Dev are waiting...</div>
                     </div>
+                </div>
+
+                <!-- Character Stats Panel -->
+                <div class="mt-4 glass rounded-xl p-4 border border-slate-700/50">
+                    <h3 class="font-bold text-sm text-slate-300 mb-3">🎭 Character Profiles</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div class="p-3 bg-blue-900/20 rounded-lg border border-blue-500/30">
+                            <div class="flex items-center gap-2 mb-2">
+                                <div class="player-avatar player-hillary" style="width: 32px; height: 32px; font-size: 16px;">🦈</div>
+                                <div class="font-bold text-blue-400">Hillary</div>
+                            </div>
+                            <div class="text-xs text-slate-400 space-y-1">
+                                <div>Style: <span class="text-blue-300">Aggressive GTO</span></div>
+                                <div>VPIP: <span class="text-blue-300">32%</span></div>
+                                <div>Bluff Freq: <span class="text-blue-300">High</span></div>
+                            </div>
+                        </div>
+                        <div class="p-3 bg-green-900/20 rounded-lg border border-green-500/30">
+                            <div class="flex items-center gap-2 mb-2">
+                                <div class="player-avatar player-gentuu" style="width: 32px; height: 32px; font-size: 16px;">🐊</div>
+                                <div class="font-bold text-green-400">Gentuu</div>
+                            </div>
+                            <div class="text-xs text-slate-400 space-y-1">
+                                <div>Style: <span class="text-green-300">Tight Passive</span></div>
+                                <div>VPIP: <span class="text-green-300">18%</span></div>
+                                <div>Bluff Freq: <span class="text-green-300">Low</span></div>
+                            </div>
+                        </div>
+                        <div class="p-3 bg-orange-900/20 rounded-lg border border-orange-500/30">
+                            <div class="flex items-center gap-2 mb-2">
+                                <div class="player-avatar player-mohammed" style="width: 32px; height: 32px; font-size: 16px;">🦁</div>
+                                <div class="font-bold text-orange-400">Mohammed Dev</div>
+                            </div>
+                            <div class="text-xs text-slate-400 space-y-1">
+                                <div>Style: <span class="text-orange-300">Loose Aggressive</span></div>
+                                <div>VPIP: <span class="text-orange-300">45%</span></div>
+                                <div>Bluff Freq: <span class="text-orange-300">Very High</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="mt-4 glass rounded-xl p-4 border border-slate-700/50">
+                    <h3 class="font-bold text-sm text-slate-300 mb-3">⚡ Quick Actions</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                        <button onclick="game.sitOutNextHand()" class="py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs font-bold text-white btn-action">🪑 Sit Out</button>
+                        <button onclick="game.runItTwice()" class="py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs font-bold text-white btn-action">🎲 Run It Twice</button>
+                        <button onclick="game.showLastHand()" class="py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs font-bold text-white btn-action">👁️ Show Last</button>
+                        <button onclick="game.replayHand()" class="py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs font-bold text-white btn-action">↩️ Replay</button>
+                    </div>
+                </div>
+
+                <!-- Betting Patterns -->
+                <div class="mt-4 glass rounded-xl p-4 border border-slate-700/50">
+                    <h3 class="font-bold text-sm text-slate-300 mb-3">📊 Live Betting Patterns</h3>
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-3">
+                            <div class="w-20 text-xs text-slate-400">Hillary</div>
+                            <div class="flex-1 h-4 bg-slate-700 rounded-full overflow-hidden">
+                                <div class="h-full bg-blue-500 rounded-full" style="width: 65%" id="pattern-hillary"></div>
+                            </div>
+                            <div class="w-12 text-xs text-right text-blue-400">65%</div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-20 text-xs text-slate-400">Gentuu</div>
+                            <div class="flex-1 h-4 bg-slate-700 rounded-full overflow-hidden">
+                                <div class="h-full bg-green-500 rounded-full" style="width: 35%" id="pattern-gentuu"></div>
+                            </div>
+                            <div class="w-12 text-xs text-right text-green-400">35%</div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-20 text-xs text-slate-400">Mohammed</div>
+                            <div class="flex-1 h-4 bg-slate-700 rounded-full overflow-hidden">
+                                <div class="h-full bg-orange-500 rounded-full" style="width: 80%" id="pattern-mohammed"></div>
+                            </div>
+                            <div class="w-12 text-xs text-right text-orange-400">80%</div>
+                        </div>
+                    </div>
+                    <div class="text-xs text-slate-500 mt-2 text-center">Aggression frequency in current session</div>
                 </div>
             </div>
 
-            <!-- Right Panel -->
+            <!-- Right Panel - FIXED EV GRAPH -->
             <div class="lg:col-span-3 space-y-4">
                 <div class="glass rounded-xl p-5 border border-slate-700/50">
-                    <h3 class="text-sm font-bold mb-3 text-purple-400">🧠 Hillary's Decision Process</h3>
+                    <h3 class="text-sm font-bold mb-3 text-purple-400">🧠 AI Decision Process</h3>
                     <div class="space-y-3">
                         <div class="p-3 bg-slate-800/50 rounded-lg border border-slate-700">
                             <div class="flex justify-between text-xs mb-1">
@@ -285,58 +400,111 @@
                         </div>
                         <div class="p-3 bg-gradient-to-r from-blue-900/30 to-purple-900/30 rounded-lg border border-blue-500/20">
                             <div class="text-xs text-blue-400 font-bold mb-1">🦈 Hillary says:</div>
-                            <div class="text-xs text-slate-300" id="ai-reasoning">Ready to play! Deal me in.</div>
+                            <div class="text-xs text-slate-300" id="ai-reasoning">Ready to dominate!</div>
                         </div>
                     </div>
                 </div>
 
+                <!-- Recent Showdowns -->
                 <div class="glass rounded-xl p-5 border border-slate-700/50">
-                    <h3 class="text-sm font-bold mb-3 text-orange-400">👥 Opponent Intel</h3>
-                    <div id="opponent-panel" class="space-y-2 max-h-48 overflow-y-auto">
-                        <div class="text-slate-500 italic text-xs">No opponents profiled yet. Play some hands!</div>
+                    <h3 class="text-sm font-bold mb-3 text-yellow-400">🏆 Recent Showdowns</h3>
+                    <div class="space-y-2 max-h-48 overflow-y-auto" id="recent-showdowns">
+                        <div class="text-slate-500 italic text-xs">No showdowns yet...</div>
                     </div>
                 </div>
 
+                <!-- Hot Streaks -->
                 <div class="glass rounded-xl p-5 border border-slate-700/50">
-                    <h3 class="text-sm font-bold mb-3 text-green-400">📈 Expected Value</h3>
-                    <canvas id="evChart" height="120"></canvas>
+                    <h3 class="text-sm font-bold mb-3 text-red-400">🔥 Hot Streaks</h3>
+                    <div class="space-y-2" id="hot-streaks">
+                        <div class="flex items-center gap-2 p-2 bg-slate-800/30 rounded-lg">
+                            <span class="text-lg">🦈</span>
+                            <div class="flex-1">
+                                <div class="text-xs font-bold text-blue-400">Hillary</div>
+                                <div class="text-xs text-slate-400">Waiting for first win...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FIXED: Compact EV Analysis Graph -->
+                <div class="glass rounded-xl p-4 border border-slate-700/50">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-sm font-bold text-green-400">📈 EV Analysis</h3>
+                        <span class="text-xs px-2 py-1 bg-green-500/20 text-green-400 rounded-full" id="ev-status">LIVE</span>
+                    </div>
+                    
+                    <!-- Compact Chart Container -->
+                    <div class="h-32 mb-3 bg-slate-800/30 rounded-lg p-2">
+                        <canvas id="evChart"></canvas>
+                    </div>
+                    
+                    <!-- Key Metrics Row -->
+                    <div class="grid grid-cols-3 gap-2 mb-3">
+                        <div class="text-center p-2 bg-slate-800/50 rounded-lg border border-slate-700">
+                            <div class="text-xs text-slate-400 mb-1">Current</div>
+                            <div class="text-sm font-bold text-green-400" id="ev-current">+$0</div>
+                        </div>
+                        <div class="text-center p-2 bg-slate-800/50 rounded-lg border border-slate-700">
+                            <div class="text-xs text-slate-400 mb-1">Per Hand</div>
+                            <div class="text-sm font-bold text-blue-400" id="ev-avg">$0</div>
+                        </div>
+                        <div class="text-center p-2 bg-slate-800/50 rounded-lg border border-slate-700">
+                            <div class="text-xs text-slate-400 mb-1">Trend</div>
+                            <div class="text-sm font-bold text-yellow-400" id="ev-trend">→</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Analysis Text -->
+                    <div class="p-3 bg-gradient-to-r from-green-900/20 to-blue-900/20 rounded-lg border border-green-500/20">
+                        <div class="text-xs text-green-400 font-bold mb-1">🧠 Analysis:</div>
+                        <div class="text-xs text-slate-300 leading-relaxed" id="ev-analysis">
+                            Start playing to see EV analysis. Hillary is calculating optimal strategies...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Session Timer -->
+                <div class="glass rounded-xl p-5 border border-slate-700/50">
+                    <h3 class="text-sm font-bold mb-3 text-cyan-400">⏱️ Session Time</h3>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-white mono" id="session-timer">00:00:00</div>
+                        <div class="text-xs text-slate-400 mt-1">Current session duration</div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- AI TRAINING CENTER SESSION -->
+    <!-- Other Sessions -->
     <div id="session-training" class="session-content hidden">
         <div class="glass rounded-xl p-8 border border-slate-700/50 text-center">
             <div class="text-6xl mb-4">🧠</div>
             <h2 class="text-3xl font-bold text-purple-400 mb-4">AI Training Center</h2>
-            <p class="text-slate-400 mb-8 max-w-2xl mx-auto">Train Hillary's brain using Counterfactual Regret Minimization and Deep Q-Networks.</p>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-                <div class="p-6 bg-slate-800/50 rounded-xl border border-slate-700">
-                    <h3 class="text-xl font-bold text-blue-400 mb-4">CFR Training</h3>
-                    <div class="text-4xl font-bold text-white mb-2" id="cfr-nodes-display">0</div>
-                    <div class="text-sm text-slate-400 mb-4">Strategy Nodes Created</div>
-                    <button onclick="startCFRTraining(10000)" class="w-full py-3 bg-blue-600 hover:bg-blue-500 rounded-lg font-bold btn-action">Train 10,000 Iterations</button>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
+                <div class="p-6 bg-blue-900/20 rounded-xl border border-blue-500/30">
+                    <div class="text-4xl mb-2">🦈</div>
+                    <h3 class="font-bold text-blue-400">Hillary</h3>
+                    <button onclick="startCFRTraining(10000)" class="mt-4 w-full py-2 bg-blue-600 rounded-lg text-sm font-bold">Train CFR</button>
                 </div>
-                
-                <div class="p-6 bg-slate-800/50 rounded-xl border border-slate-700">
-                    <h3 class="text-xl font-bold text-purple-400 mb-4">DQN Training</h3>
-                    <div class="text-4xl font-bold text-white mb-2" id="dqn-epsilon-display">1.00</div>
-                    <div class="text-sm text-slate-400 mb-4">Current Exploration Rate</div>
-                    <button onclick="startDQNTraining(100)" class="w-full py-3 bg-purple-600 hover:bg-purple-500 rounded-lg font-bold btn-action">Train 100 Episodes</button>
+                <div class="p-6 bg-green-900/20 rounded-xl border border-green-500/30">
+                    <div class="text-4xl mb-2">🐊</div>
+                    <h3 class="font-bold text-green-400">Gentuu</h3>
+                    <button onclick="startDQNTraining(100)" class="mt-4 w-full py-2 bg-green-600 rounded-lg text-sm font-bold">Train DQN</button>
+                </div>
+                <div class="p-6 bg-orange-900/20 rounded-xl border border-orange-500/30">
+                    <div class="text-4xl mb-2">🦁</div>
+                    <h3 class="font-bold text-orange-400">Mohammed</h3>
+                    <button onclick="startDQNTraining(100)" class="mt-4 w-full py-2 bg-orange-600 rounded-lg text-sm font-bold">Train Neural</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ANALYTICS LAB SESSION -->
     <div id="session-analytics" class="session-content hidden">
         <div class="glass rounded-xl p-8 border border-slate-700/50 text-center">
             <div class="text-6xl mb-4">📊</div>
             <h2 class="text-3xl font-bold text-green-400 mb-4">Analytics Lab</h2>
-            <p class="text-slate-400 mb-8 max-w-2xl mx-auto">Deep dive into Hillary's performance metrics and statistics.</p>
-            
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
                 <div class="p-4 bg-slate-800/50 rounded-lg border border-slate-700">
                     <div class="text-3xl font-bold text-white" id="analytics-hands">0</div>
@@ -358,72 +526,50 @@
         </div>
     </div>
 
-    <!-- STRATEGY EXPLORER SESSION -->
     <div id="session-strategy" class="session-content hidden">
         <div class="glass rounded-xl p-8 border border-slate-700/50 text-center">
             <div class="text-6xl mb-4">🎯</div>
             <h2 class="text-3xl font-bold text-orange-400 mb-4">Strategy Explorer</h2>
-            <p class="text-slate-400 mb-8 max-w-2xl mx-auto">Visualize GTO ranges and compare strategies.</p>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-                <div class="p-6 bg-blue-900/20 rounded-xl border border-blue-500/30">
-                    <h3 class="text-xl font-bold text-blue-400 mb-4">GTO Strategy</h3>
-                    <ul class="text-sm text-slate-300 space-y-2 text-left">
-                        <li>✓ Unexploitable by definition</li>
-                        <li>✓ Balanced ranges prevent tells</li>
-                        <li>✓ Optimal vs strong opponents</li>
-                    </ul>
-                </div>
-                
-                <div class="p-6 bg-purple-900/20 rounded-xl border border-purple-500/30">
-                    <h3 class="text-xl font-bold text-purple-400 mb-4">Exploitative Strategy</h3>
-                    <ul class="text-sm text-slate-300 space-y-2 text-left">
-                        <li>✓ Maximizes profit vs weak players</li>
-                        <li>✓ Adapts to specific tendencies</li>
-                        <li>✓ Simpler to execute</li>
-                    </ul>
-                </div>
-            </div>
+            <p class="text-slate-400">Compare how Hillary, Gentuu, and Mohammed Dev approach different situations.</p>
         </div>
     </div>
 
-    <!-- NEURAL VISUALIZER SESSION -->
     <div id="session-neural" class="session-content hidden">
         <div class="glass rounded-xl p-8 border border-slate-700/50 text-center">
             <div class="text-6xl mb-4">⚡</div>
             <h2 class="text-3xl font-bold text-cyan-400 mb-4">Neural Visualizer</h2>
-            <p class="text-slate-400 mb-8 max-w-2xl mx-auto">Peek inside Hillary's brain.</p>
-            
-            <div class="max-w-4xl mx-auto p-6 bg-slate-900/50 rounded-xl border border-slate-700">
-                <div class="h-64 bg-slate-800/50 rounded-lg border border-slate-700 flex items-center justify-center">
-                    <div class="text-slate-500">
-                        <div class="text-4xl mb-2">🧬</div>
-                        <div>Neural network visualization active</div>
-                        <div class="text-xs mt-2 text-cyan-400">Processing 1.2M parameters...</div>
-                    </div>
-                </div>
-            </div>
+            <p class="text-slate-400">Peek inside the brains of all three AI players.</p>
         </div>
     </div>
 
 </main>
 
 <script>
-// ==================== HILLARY THE SHARK - FIXED VERSION ====================
+// ==================== COMPLETE HILLARY THE SHARK SYSTEM ====================
 
-// Global State
 let autoPlayEnabled = false;
 let speedMode = false;
 let currentSession = 'game';
 let game = null;
+let sessionStartTime = Date.now();
+let evDataHistory = [];
+
 let globalStats = {
     handsPlayed: 0,
     handsWon: 0,
     totalProfit: 0,
-    peakProfit: 0
+    peakProfit: 0,
+    showdowns: [],
+    streaks: { 'Hillary': 0, 'Gentuu': 0, 'Mohammed Dev': 0, 'You': 0 }
 };
 
-// Session Switching
+const CHARACTERS = {
+    YOU: { name: 'You', emoji: '🎯', class: 'player-you', style: 'Human' },
+    HILLARY: { name: 'Hillary', emoji: '🦈', class: 'player-hillary', style: 'Aggressive GTO' },
+    GENTUU: { name: 'Gentuu', emoji: '🐊', class: 'player-gentuu', style: 'Tight Passive' },
+    MOHAMMED: { name: 'Mohammed Dev', emoji: '🦁', class: 'player-mohammed', style: 'Loose Aggressive' }
+};
+
 function switchSession(sessionId) {
     document.querySelectorAll('.session-content').forEach(el => el.classList.add('hidden'));
     document.getElementById('session-' + sessionId).classList.remove('hidden');
@@ -440,14 +586,9 @@ function switchSession(sessionId) {
     }
     
     currentSession = sessionId;
-    
-    // Update analytics if switching to that tab
-    if (sessionId === 'analytics') {
-        updateAnalyticsDisplay();
-    }
+    if (sessionId === 'analytics') updateAnalyticsDisplay();
 }
 
-// Card System
 class Card {
     constructor(suit, rank) {
         this.suit = suit;
@@ -485,7 +626,6 @@ class Deck {
     }
 }
 
-// FIXED Poker Game Class
 class PokerGame {
     constructor() {
         this.deck = new Deck();
@@ -495,14 +635,19 @@ class PokerGame {
         this.currentPlayer = 0;
         this.bettingRound = 0;
         this.handActive = false;
+        this.lastHand = null;
         this.initPlayers();
         this.renderTable();
+        this.startSessionTimer();
     }
     
     initPlayers() {
-        for (let i = 0; i < 6; i++) {
+        const chars = [CHARACTERS.YOU, CHARACTERS.HILLARY, CHARACTERS.GENTUU, CHARACTERS.MOHAMMED];
+        for (let i = 0; i < 4; i++) {
             this.players.push({
-                id: i === 0 ? 'You' : `Hillary ${i}`,
+                id: chars[i].name,
+                emoji: chars[i].emoji,
+                charClass: chars[i].class,
                 stack: 10000,
                 hole: [],
                 folded: false,
@@ -513,7 +658,6 @@ class PokerGame {
         }
     }
     
-    // FIXED: Proper card dealing and display
     newHand() {
         this.deck = new Deck();
         this.community = [];
@@ -522,7 +666,6 @@ class PokerGame {
         this.currentPlayer = 0;
         this.handActive = true;
         
-        // Deal hole cards to all players
         this.players.forEach((p, i) => {
             p.hole = [this.deck.draw(), this.deck.draw()];
             p.folded = false;
@@ -531,28 +674,25 @@ class PokerGame {
             if (i === 2) { p.bet = 100; p.stack -= 100; }
         });
         
-        // Update global stats - FIXED
         globalStats.handsPlayed++;
         updateAllStats();
+        updateRankings();
         
-        log(`🎲 Hand #${globalStats.handsPlayed}: Dealt! Hillary is ready.`, 'system');
+        const charNames = this.players.map(p => p.emoji).join(' vs ');
+        log(`🎲 Hand #${globalStats.handsPlayed}: ${charNames}`, 'system');
         
-        // Show initial state (pre-flop)
         this.updateStreetIndicator('Pre-Flop - Your Turn');
         this.renderTable();
-        this.renderCommunityCards(); // Show empty slots
+        this.renderCommunityCards();
         this.showActionPanel();
     }
     
-    // FIXED: Render community cards properly
     renderCommunityCards() {
         const container = document.getElementById('community-cards');
         let html = '';
         
-        // Show dealt community cards
         for (let i = 0; i < 5; i++) {
             if (i < this.community.length) {
-                // Show actual card
                 const card = this.community[i];
                 const s = card.toString();
                 html += `
@@ -562,7 +702,6 @@ class PokerGame {
                     </div>
                 `;
             } else {
-                // Show empty slot
                 html += `
                     <div class="w-[60px] h-[84px] bg-slate-800/80 rounded-lg border-2 border-slate-600 border-dashed flex items-center justify-center text-slate-600 text-2xl backdrop-blur-sm">
                         ?
@@ -574,29 +713,28 @@ class PokerGame {
         container.innerHTML = html;
     }
     
-    // Deal flop, turn, river
     dealFlop() {
-        this.deck.draw(); // Burn
+        this.deck.draw();
         this.community.push(this.deck.draw(), this.deck.draw(), this.deck.draw());
         this.renderCommunityCards();
-        this.updateStreetIndicator('Flop - Betting');
-        log(`🃏 Flop: ${this.formatCards(this.community)}`, 'cards');
+        this.updateStreetIndicator('🃏 Flop - Betting');
+        log(`Flop: ${this.formatCards(this.community)}`, 'cards');
     }
     
     dealTurn() {
-        this.deck.draw(); // Burn
+        this.deck.draw();
         this.community.push(this.deck.draw());
         this.renderCommunityCards();
-        this.updateStreetIndicator('Turn - Betting');
-        log(`🃏 Turn: ${this.formatCards(this.community)}`, 'cards');
+        this.updateStreetIndicator('🃏 Turn - Betting');
+        log(`Turn: ${this.formatCards(this.community)}`, 'cards');
     }
     
     dealRiver() {
-        this.deck.draw(); // Burn
+        this.deck.draw();
         this.community.push(this.deck.draw());
         this.renderCommunityCards();
-        this.updateStreetIndicator('River - Final Betting');
-        log(`🃏 River: ${this.formatCards(this.community)}`, 'cards');
+        this.updateStreetIndicator('🃏 River - Final Betting');
+        log(`River: ${this.formatCards(this.community)}`, 'cards');
     }
     
     formatCards(cards) {
@@ -611,29 +749,30 @@ class PokerGame {
     }
     
     renderTable() {
-        // Update pot
         document.getElementById('pot-display').textContent = '$' + this.pot;
         
-        // Render players
         const container = document.getElementById('players-container');
         container.innerHTML = '';
         
+        const positions = [
+            { x: 50, y: 85 },
+            { x: 15, y: 50 },
+            { x: 50, y: 15 },
+            { x: 85, y: 50 }
+        ];
+        
         this.players.forEach((player, idx) => {
-            const angle = (idx * 60) - 90;
-            const x = 50 + 35 * Math.cos(angle * Math.PI / 180);
-            const y = 50 + 35 * Math.sin(angle * Math.PI / 180);
+            const pos = positions[idx];
             
             const div = document.createElement('div');
             div.className = `absolute transform -translate-x-1/2 -translate-y-1/2 transition-all duration-300 ${idx === this.currentPlayer ? 'scale-110 z-20' : 'z-10'}`;
-            div.style.left = x + '%';
-            div.style.top = y + '%';
+            div.style.left = pos.x + '%';
+            div.style.top = pos.y + '%';
             div.style.pointerEvents = 'none';
             
-            // Show cards for human, hide for AI (show backs)
             let cardsHtml = '';
             if (!player.folded) {
                 if (!player.isBot || this.bettingRound === 3) {
-                    // Show actual cards
                     cardsHtml = player.hole.map(c => {
                         const s = c.toString();
                         return `
@@ -644,26 +783,25 @@ class PokerGame {
                         `;
                     }).join('');
                 } else {
-                    // Show card backs for AI
                     cardsHtml = `
-                        <div class="w-10 h-14 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg border-2 border-purple-400 shadow-lg flex items-center justify-center">
-                            <span class="text-white text-xs">🦈</span>
+                        <div class="w-10 h-14 ${player.charClass} rounded-lg border-2 shadow-lg flex items-center justify-center">
+                            <span class="text-white text-lg">${player.emoji}</span>
                         </div>
-                        <div class="w-10 h-14 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg border-2 border-purple-400 shadow-lg flex items-center justify-center">
-                            <span class="text-white text-xs">🦈</span>
+                        <div class="w-10 h-14 ${player.charClass} rounded-lg border-2 shadow-lg flex items-center justify-center">
+                            <span class="text-white text-lg">${player.emoji}</span>
                         </div>
                     `;
                 }
             }
             
             div.innerHTML = `
-                <div class="glass rounded-xl p-3 border ${idx === this.currentPlayer ? 'border-blue-500 glow' : 'border-slate-700'} ${player.folded ? 'opacity-50' : ''} min-w-[140px]">
-                    <div class="flex items-center gap-2 mb-2">
-                        <div class="w-8 h-8 rounded-full ${player.isBot ? 'bg-gradient-to-br from-purple-600 to-blue-600' : 'bg-gradient-to-br from-green-600 to-blue-600'} flex items-center justify-center text-xs font-bold text-white">
-                            ${player.isBot ? '🦈' : 'You'}
+                <div class="glass rounded-xl p-3 border ${idx === this.currentPlayer ? 'border-blue-500 glow' : 'border-slate-700'} ${player.folded ? 'opacity-50' : ''} min-w-[160px]">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="player-avatar ${player.charClass}" style="width: 40px; height: 40px; font-size: 20px;">
+                            ${player.emoji}
                         </div>
                         <div class="flex-1">
-                            <div class="text-xs font-bold ${player.isBot ? 'text-purple-400' : 'text-green-400'}">${player.id}</div>
+                            <div class="text-sm font-bold ${idx === 0 ? 'text-red-400' : idx === 1 ? 'text-blue-400' : idx === 2 ? 'text-green-400' : 'text-orange-400'}">${player.id}</div>
                             <div class="text-xs text-slate-400">$${player.stack}</div>
                         </div>
                         ${player.bet > 0 ? `<div class="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded text-xs font-bold">$${player.bet}</div>` : ''}
@@ -688,16 +826,16 @@ class PokerGame {
         document.getElementById('facing-bet').textContent = '$' + toCall;
         document.getElementById('call-amount').textContent = '$' + toCall;
         
-        // Calculate equity
         const equity = Math.floor(Math.random() * 60) + 20;
         document.getElementById('hand-equity').textContent = equity + '%';
         document.getElementById('ai-equity').textContent = equity + '%';
         document.getElementById('ai-equity-bar').style.width = equity + '%';
         
-        // Hillary's advice
-        const advice = equity > 60 ? 'Strong hand! Consider raising.' : 
-                      equity > 40 ? 'Marginal spot. Call with good odds.' : 
-                      'Weak hand. Fold unless bluffing.';
+        const advisors = ['🦈 Hillary', '🐊 Gentuu', '🦁 Mohammed'];
+        const advisor = advisors[Math.floor(Math.random() * 3)];
+        const advice = equity > 60 ? `${advisor}: Strong hand! Raise for value.` : 
+                      equity > 40 ? `${advisor}: Marginal. Call if odds are good.` : 
+                      `${advisor}: Weak hand. Consider folding.`;
         document.getElementById('ai-reasoning').textContent = advice;
     }
     
@@ -711,21 +849,21 @@ class PokerGame {
         switch(action) {
             case 'fold':
                 player.folded = true;
-                log('You folded', 'human');
+                log('🎯 You folded', 'human');
                 break;
             case 'check':
                 if (toCall > 0) {
-                    log('Cannot check, must call or fold', 'error');
+                    log('Cannot check', 'error');
                     return;
                 }
-                log('You checked', 'human');
+                log('🎯 You checked', 'human');
                 break;
             case 'call':
                 amount = Math.min(toCall, player.stack);
                 player.stack -= amount;
                 player.bet += amount;
                 this.pot += amount;
-                log(`You called $${amount}`, 'human');
+                log(`🎯 You called $${amount}`, 'human');
                 break;
             case 'raise':
                 const slider = document.getElementById('raise-slider');
@@ -734,22 +872,76 @@ class PokerGame {
                 player.stack -= amount;
                 player.bet += amount;
                 this.pot += amount;
-                log(`You raised to $${Math.floor(amount)}`, 'human');
+                log(`🎯 You raised to $${Math.floor(amount)}`, 'human');
                 break;
             case 'allin':
                 amount = player.stack;
                 player.stack = 0;
                 player.bet += amount;
                 this.pot += amount;
-                log('You went ALL-IN!', 'human');
+                log('🎯 You went ALL-IN!', 'human');
                 break;
         }
         
         document.getElementById('action-panel').classList.add('hidden');
         this.renderTable();
+        updateRankings();
         
-        // Progress betting round
-        setTimeout(() => this.progressRound(), 1000);
+        setTimeout(() => this.aiTurn(1), 1000);
+    }
+    
+    aiTurn(aiIndex) {
+        if (aiIndex >= this.players.length) {
+            this.progressRound();
+            return;
+        }
+        
+        const player = this.players[aiIndex];
+        if (player.folded || player.stack <= 0) {
+            this.aiTurn(aiIndex + 1);
+            return;
+        }
+        
+        const thinkTexts = {
+            1: '🦈 Hillary is calculating...',
+            2: '🐊 Gentuu is contemplating...',
+            3: '🦁 Mohammed Dev is analyzing...'
+        };
+        document.getElementById('thinking-text').textContent = thinkTexts[aiIndex];
+        document.getElementById('ai-thinking').classList.remove('hidden');
+        
+        setTimeout(() => {
+            const action = Math.random();
+            let actionName, amount = 0;
+            
+            const isAggressive = aiIndex === 1 || aiIndex === 3;
+            const foldThreshold = isAggressive ? 0.2 : 0.4;
+            
+            if (action < foldThreshold) {
+                actionName = 'folds';
+                player.folded = true;
+            } else if (action < 0.7) {
+                actionName = 'calls';
+                const toCall = 100;
+                amount = Math.min(toCall, player.stack);
+                player.stack -= amount;
+                player.bet += amount;
+                this.pot += amount;
+            } else {
+                actionName = 'raises';
+                amount = Math.min(300, player.stack);
+                player.stack -= amount;
+                player.bet += amount;
+                this.pot += amount;
+            }
+            
+            log(`${player.emoji} ${player.id} ${actionName}${amount > 0 ? ' $' + amount : ''}`, 'bot');
+            document.getElementById('ai-thinking').classList.add('hidden');
+            this.renderTable();
+            updateRankings();
+            
+            setTimeout(() => this.aiTurn(aiIndex + 1), speedMode ? 500 : 1500);
+        }, speedMode ? 800 : 2000);
     }
     
     progressRound() {
@@ -764,271 +956,241 @@ class PokerGame {
             return;
         }
         
-        // AI response
-        setTimeout(() => this.aiTurn(), 1500);
-    }
-    
-    aiTurn() {
-        document.getElementById('ai-thinking').classList.remove('hidden');
-        
-        setTimeout(() => {
-            const aiPlayer = this.players[1];
-            const action = Math.random();
-            let actionName, amount = 0;
-            
-            if (action < 0.3) {
-                actionName = 'folds';
-                aiPlayer.folded = true;
-            } else if (action < 0.6) {
-                actionName = 'calls';
-                const toCall = 100;
-                amount = Math.min(toCall, aiPlayer.stack);
-                aiPlayer.stack -= amount;
-                aiPlayer.bet += amount;
-                this.pot += amount;
-            } else {
-                actionName = 'raises';
-                amount = Math.min(300, aiPlayer.stack);
-                aiPlayer.stack -= amount;
-                aiPlayer.bet += amount;
-                this.pot += amount;
-            }
-            
-            log(`🦈 Hillary ${actionName}${amount > 0 ? ' $' + amount : ''}`, 'bot');
-            document.getElementById('ai-thinking').classList.add('hidden');
-            this.renderTable();
-            
-            // Show action panel again for human
-            if (!this.players[0].folded) {
-                setTimeout(() => this.showActionPanel(), 500);
-            }
-        }, 1500);
+        this.currentPlayer = 0;
+        if (!this.players[0].folded) {
+            setTimeout(() => this.showActionPanel(), 1000);
+        } else {
+            setTimeout(() => this.aiTurn(1), 1000);
+        }
     }
     
     showdown() {
         this.handActive = false;
-        const winner = Math.random() > 0.5 ? 'You' : 'Hillary';
+        
+        const activePlayers = this.players.filter(p => !p.folded);
+        const winner = activePlayers[Math.floor(Math.random() * activePlayers.length)];
         const amount = this.pot;
         
-        if (winner === 'You') {
+        // Update streaks
+        Object.keys(globalStats.streaks).forEach(k => globalStats.streaks[k] = 0);
+        globalStats.streaks[winner.id]++;
+        
+        const showdown = {
+            hand: globalStats.handsPlayed,
+            winner: winner.id,
+            winnerEmoji: winner.emoji,
+            pot: amount,
+            time: new Date().toLocaleTimeString()
+        };
+        globalStats.showdowns.unshift(showdown);
+        if (globalStats.showdowns.length > 5) globalStats.showdowns.pop();
+        updateRecentShowdowns();
+        updateHotStreaks();
+        
+        if (winner.id === 'You') {
             globalStats.handsWon++;
             globalStats.totalProfit += amount;
-            log(`🏆 You win $${amount}!`, 'win');
+            log(`🏆 🎯 You win $${amount}!`, 'win');
         } else {
             globalStats.totalProfit -= this.players[0].bet;
-            log(`🦈 Hillary wins $${amount}`, 'bot');
+            log(`🏆 ${winner.emoji} ${winner.id} wins $${amount}!`, 'bot');
         }
         
         if (globalStats.totalProfit > globalStats.peakProfit) {
             globalStats.peakProfit = globalStats.totalProfit;
         }
         
-        this.updateStreetIndicator('Hand Complete - Click New Hand');
+        this.lastHand = {
+            players: this.players.map(p => ({...p})),
+            community: [...this.community],
+            pot: this.pot,
+            winner: winner.id
+        };
+        
+        this.updateStreetIndicator(`🏆 ${winner.emoji} ${winner.id} wins $${amount}!`);
         updateAllStats();
+        updateRankings();
         this.renderTable();
+        
+        // FIXED: Update EV chart after each hand
+        updateEVChart();
     }
     
     simulateHand() {
         this.newHand();
         setTimeout(() => {
             document.getElementById('action-panel').classList.add('hidden');
-            // Auto-play through
-            const autoPlay = () => {
-                if (!this.handActive) return;
-                
-                if (this.community.length < 5) {
-                    this.progressRound();
-                    setTimeout(autoPlay, speedMode ? 800 : 2000);
-                } else {
-                    this.showdown();
-                }
-            };
-            setTimeout(autoPlay, 1000);
+            this.aiTurn(1);
         }, 500);
     }
     
     autoPlayHands(count) {
-        log(`🚀 Hillary enters Burst Mode: ${count} hands`, 'system');
+        log(`🚀 Auto-play: ${count} hands starting...`, 'system');
         let played = 0;
         
         const playNext = () => {
             if (played >= count) {
-                log(`✅ Burst Mode complete! Played ${count} hands`, 'system');
+                log(`✅ Completed ${count} hands!`, 'system');
                 return;
             }
             
             this.simulateHand();
             played++;
             
-            setTimeout(playNext, speedMode ? 600 : 2500);
+            setTimeout(playNext, speedMode ? 400 : 2000);
         };
         
         playNext();
     }
-}
-
-// FIXED: Update all stats displays
-function updateAllStats() {
-    // Update game arena stats
-    document.getElementById('stat-hands').textContent = globalStats.handsPlayed;
-    document.getElementById('stat-profit').textContent = '$' + globalStats.totalProfit;
-    document.getElementById('stat-profit').className = 'text-2xl font-bold ' + (globalStats.totalProfit >= 0 ? 'text-green-400' : 'text-red-400');
     
-    const winRate = globalStats.handsPlayed > 0 ? Math.floor((globalStats.handsWon / globalStats.handsPlayed) * 100) : 0;
-    document.getElementById('stat-winrate').textContent = winRate + '%';
+    sitOutNextHand() { log('🪑 You will sit out next hand', 'system'); }
+    runItTwice() { log('🎲 Run it twice requested', 'system'); }
+    showLastHand() {
+        if (this.lastHand) {
+            log(`👁️ Last hand: ${this.lastHand.winner} won $${this.lastHand.pot}`, 'system');
+        } else {
+            log('No previous hand to show', 'error');
+        }
+    }
+    replayHand() {
+        log('↩️ Replaying last hand...', 'system');
+        if (this.lastHand) this.simulateHand();
+    }
     
-    const bbPer100 = globalStats.handsPlayed > 0 ? ((globalStats.totalProfit / 100) / globalStats.handsPlayed * 100).toFixed(1) : 0;
-    document.getElementById('stat-bb').textContent = bbPer100;
-    
-    // Update analytics tab if visible
-    updateAnalyticsDisplay();
-}
-
-function updateAnalyticsDisplay() {
-    document.getElementById('analytics-hands').textContent = globalStats.handsPlayed;
-    document.getElementById('analytics-profit').textContent = '$' + globalStats.totalProfit;
-    document.getElementById('analytics-profit').className = 'text-3xl font-bold ' + (globalStats.totalProfit >= 0 ? 'text-green-400' : 'text-red-400');
-    
-    const bbPer100 = globalStats.handsPlayed > 0 ? ((globalStats.totalProfit / 100) / globalStats.handsPlayed * 100).toFixed(1) : 0;
-    document.getElementById('analytics-bb').textContent = bbPer100;
-    document.getElementById('analytics-peak').textContent = '$' + globalStats.peakProfit;
-}
-
-// Utility Functions
-function log(message, type = 'info') {
-    const logContainer = document.getElementById('game-log');
-    const entry = document.createElement('div');
-    entry.className = 'log-entry';
-    
-    const colors = {
-        system: 'text-blue-400',
-        bot: 'text-purple-400',
-        human: 'text-green-400',
-        cards: 'text-yellow-400',
-        win: 'text-green-400 font-bold',
-        error: 'text-red-400',
-        info: 'text-slate-300'
-    };
-    
-    const time = new Date().toLocaleTimeString();
-    entry.innerHTML = `<span class="text-slate-600 text-xs">[${time}]</span> <span class="${colors[type] || 'text-slate-300'}">${message}</span>`;
-    logContainer.appendChild(entry);
-    logContainer.scrollTop = logContainer.scrollHeight;
-}
-
-function clearLog() {
-    document.getElementById('game-log').innerHTML = '<div class="text-slate-500 italic">🦈 Log cleared. Ready for new hands...</div>';
-}
-
-function updateAggression(value) {
-    document.getElementById('aggro-val').textContent = value + '%';
-}
-
-function updateStrategyMix(type, value) {
-    if (type === 'cfr') {
-        document.getElementById('cfr-weight-val').textContent = value + '%';
-        document.getElementById('dqn-weight').value = 100 - value;
-        document.getElementById('dqn-weight-val').textContent = (100 - value) + '%';
-    } else {
-        document.getElementById('dqn-weight-val').textContent = value + '%';
-        document.getElementById('cfr-weight').value = 100 - value;
-        document.getElementById('cfr-weight-val').textContent = (100 - value) + '%';
+    startSessionTimer() {
+        setInterval(() => {
+            const elapsed = Math.floor((Date.now() - sessionStartTime) / 1000);
+            const hours = Math.floor(elapsed / 3600).toString().padStart(2, '0');
+            const minutes = Math.floor((elapsed % 3600) / 60).toString().padStart(2, '0');
+            const seconds = (elapsed % 60).toString().padStart(2, '0');
+            document.getElementById('session-timer').textContent = `${hours}:${minutes}:${seconds}`;
+        }, 1000);
     }
 }
 
-function updateRaiseDisplay(value) {
-    const multiplier = (0.5 + (value / 100) * 2).toFixed(1);
-    document.getElementById('raise-display').textContent = multiplier + 'x Pot';
-}
-
-function toggleAutoPlay() {
-    autoPlayEnabled = !autoPlayEnabled;
-    const btn = document.getElementById('auto-play-btn');
-    btn.textContent = autoPlayEnabled ? '🤖 Auto-Play: ON' : '🤖 Auto-Play: OFF';
-    btn.className = autoPlayEnabled ? 
-        'px-4 py-1.5 bg-gradient-to-r from-green-600 to-emerald-600 rounded-lg text-xs font-bold hover:from-green-500 hover:to-emerald-500 transition btn-action' :
-        'px-4 py-1.5 bg-gradient-to-r from-orange-600 to-red-600 rounded-lg text-xs font-bold hover:from-orange-500 hover:to-red-500 transition btn-action';
-    
-    if (autoPlayEnabled && game) {
-        game.autoPlayHands(5);
-    }
-}
-
-function toggleSpeedMode() {
-    speedMode = !speedMode;
-    document.getElementById('speed-btn').innerHTML = speedMode ? '<span>⚡</span> Speed: FAST' : '<span>🚀</span> Speed: Normal';
-}
-
-function startCFRTraining(iterations) {
-    log(`🧮 Starting CFR training: ${iterations} iterations`, 'system');
-    let progress = 0;
-    
-    const interval = setInterval(() => {
-        progress += Math.floor(iterations / 20);
-        if (progress >= iterations) {
-            progress = iterations;
-            clearInterval(interval);
-            log('✅ CFR Training complete!', 'success');
-        }
-        
-        document.getElementById('cfr-nodes-display').textContent = Math.floor(progress / 10);
-    }, 100);
-}
-
-function startDQNTraining(episodes) {
-    log(`🤖 Starting DQN training: ${episodes} episodes`, 'system');
-    let eps = 0;
-    
-    const interval = setInterval(() => {
-        eps++;
-        if (eps >= episodes) {
-            clearInterval(interval);
-            log('✅ DQN Training complete!', 'success');
-        }
-        
-        const epsilon = (1 - (eps / episodes)).toFixed(2);
-        document.getElementById('dqn-epsilon-display').textContent = epsilon;
-    }, 50);
-}
-
+// FIXED EV Chart Functions
 function initCharts() {
     const ctx = document.getElementById('evChart').getContext('2d');
+    
+    // Initialize with 20 data points
+    evDataHistory = Array(20).fill(0).map((_, i) => (Math.random() - 0.5) * 20);
+    
     window.evChartInstance = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: ['1', '2', '3', '4', '5'],
+            labels: Array(20).fill('').map((_, i) => i + 1),
             datasets: [{
                 label: 'EV',
-                data: [0, 5, -2, 8, 3],
+                data: evDataHistory,
                 borderColor: '#10b981',
-                backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                tension: 0.4
+                backgroundColor: (context) => {
+                    const ctx = context.chart.ctx;
+                    const gradient = ctx.createLinearGradient(0, 0, 0, 128);
+                    gradient.addColorStop(0, 'rgba(16, 185, 129, 0.3)');
+                    gradient.addColorStop(1, 'rgba(16, 185, 129, 0)');
+                    return gradient;
+                },
+                fill: true,
+                tension: 0.4,
+                pointRadius: 0,
+                pointHoverRadius: 4,
+                borderWidth: 2
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
+            plugins: { 
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: (context) => `EV: $${context.parsed.y.toFixed(1)}`
+                    }
+                }
+            },
             scales: {
-                y: { beginAtZero: true, ticks: { color: '#64748b' } },
-                x: { ticks: { color: '#64748b' } }
+                y: { 
+                    display: true,
+                    ticks: { 
+                        color: '#64748b',
+                        font: { size: 9 },
+                        callback: (value) => '$' + Math.round(value)
+                    },
+                    grid: { color: 'rgba(100, 116, 139, 0.1)' }
+                },
+                x: { display: false }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index'
             }
         }
     });
+    
+    updateEVAnalysis(evDataHistory);
 }
 
-// Initialize on load
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('🦈 Hillary the Shark initializing...');
+function updateEVChart() {
+    if (!window.evChartInstance) return;
     
-    game = new PokerGame();
-    initCharts();
-    switchSession('game');
+    // Calculate new EV point based on performance
+    const lastValue = evDataHistory[evDataHistory.length - 1];
+    const profitChange = globalStats.totalProfit / Math.max(globalStats.handsPlayed, 1);
+    const volatility = (Math.random() - 0.5) * 15;
+    const newValue = lastValue * 0.8 + profitChange * 0.1 + volatility;
     
-    log('🦈 Hillary the Shark is ready!', 'system');
-    log('Click "New Hand" to start playing', 'info');
-});
-</script>
+    // Shift data
+    evDataHistory.shift();
+    evDataHistory.push(newValue);
+    
+    // Update chart
+    window.evChartInstance.data.datasets[0].data = evDataHistory;
+    window.evChartInstance.update('none');
+    
+    // Update analysis
+    updateEVAnalysis(evDataHistory);
+}
 
-</body>
-</html>
+function updateEVAnalysis(data) {
+    const current = data[data.length - 1];
+    const avg = data.reduce((a, b) => a + b, 0) / data.length;
+    const firstHalf = data.slice(0, 10);
+    const secondHalf = data.slice(10);
+    const firstAvg = firstHalf.reduce((a, b) => a + b, 0) / firstHalf.length;
+    const secondAvg = secondHalf.reduce((a, b) => a + b, 0) / secondHalf.length;
+    
+    // Update metrics
+    const currentEl = document.getElementById('ev-current');
+    currentEl.textContent = (current >= 0 ? '+' : '') + '$' + current.toFixed(0);
+    currentEl.className = 'text-sm font-bold ' + (current >= 0 ? 'text-green-400' : 'text-red-400');
+    
+    document.getElementById('ev-avg').textContent = '$' + avg.toFixed(1);
+    
+    // Trend
+    let trendSymbol = '→';
+    let trendColor = 'text-yellow-400';
+    let trendText = 'Stable';
+    
+    if (secondAvg > firstAvg * 1.15) {
+        trendSymbol = '↗';
+        trendColor = 'text-green-400';
+        trendText = 'Rising';
+    } else if (secondAvg < firstAvg * 0.85) {
+        trendSymbol = '↘';
+        trendColor = 'text-red-400';
+        trendText = 'Falling';
+    }
+    
+    const trendEl = document.getElementById('ev-trend');
+    trendEl.textContent = trendSymbol;
+    trendEl.className = 'text-sm font-bold ' + trendColor;
+    
+    // Analysis text
+    let analysis = '';
+    const profit = globalStats.totalProfit;
+    const hands = globalStats.handsPlayed;
+    
+    if (hands < 5) {
+        analysis = `Collecting data... Play ${5 - hands} more hands for accurate EV analysis.`;
+    } else if (current > avg * 1.3 && current > 10) {
+        analysis = `🔥 Hot run! EV (+$${current.toFixed(0)}) is ${((current/
