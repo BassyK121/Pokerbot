@@ -6,14 +6,12 @@
     <title>Hillary the Shark - Advanced Poker AI</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tensorflow/4.10.0/tf.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; background: #0a0e1a; color: #e2e8f0; overflow-x: hidden; }
         .mono { font-family: 'JetBrains Mono', monospace; }
         .glass { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(148, 163, 184, 0.1); }
-        .card { width: 60px; height: 84px; background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: bold; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3); transition: all 0.3s ease; cursor: pointer; }
-        .card:hover { transform: translateY(-8px) rotateY(10deg); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); }
+        .card { width: 60px; height: 84px; background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: bold; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3); transition: all 0.3s ease; }
         .card.red { color: #dc2626; }
         .card.black { color: #1e293b; }
         .suit { font-size: 24px; line-height: 1; }
@@ -24,38 +22,16 @@
         .pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
         .slider { -webkit-appearance: none; width: 100%; height: 6px; border-radius: 5px; background: #334155; outline: none; cursor: pointer; }
-        .slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #3b82f6; cursor: pointer; transition: all 0.2s; }
-        .slider::-webkit-slider-thumb:hover { transform: scale(1.2); background: #60a5fa; }
-        .btn-action { transition: all 0.2s; position: relative; overflow: hidden; cursor: pointer; }
+        .slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #3b82f6; cursor: pointer; }
+        .btn-action { transition: all 0.2s; cursor: pointer; }
         .btn-action:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.3); }
-        .btn-action:active { transform: translateY(0); }
-        .btn-action::after { content: ''; position: absolute; inset: 0; background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent); transform: translateX(-100%); transition: transform 0.5s; }
-        .btn-action:hover::after { transform: translateX(100%); }
         .stat-card { transition: all 0.3s; cursor: pointer; }
-        .stat-card:hover { transform: translateY(-5px); background: rgba(30, 41, 59, 0.8); border-color: rgba(59, 130, 246, 0.5); }
         .session-tab { transition: all 0.3s; cursor: pointer; }
         .session-tab.active { background: rgba(59, 130, 246, 0.2); border-color: #3b82f6; color: #60a5fa; }
-        .session-tab:hover:not(.active) { background: rgba(59, 130, 246, 0.1); }
-        .neural-node { fill: #3b82f6; animation: neuralPulse 2s infinite; }
-        @keyframes neuralPulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+        .hidden { display: none !important; }
         .log-entry { border-left: 3px solid #3b82f6; padding-left: 12px; margin: 4px 0; font-size: 0.875rem; animation: slideIn 0.3s ease; }
         @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
-        .player-seat { transition: all 0.3s; }
-        .player-seat.active { transform: scale(1.1); z-index: 20; }
         .chip { width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); border: 2px solid #92400e; box-shadow: 0 2px 4px rgba(0,0,0,0.3); display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: #78350f; }
-        .progress-ring { transform: rotate(-90deg); }
-        .progress-ring-circle { transition: stroke-dashoffset 0.35s; transform-origin: 50% 50%; }
-        .heatmap-cell { transition: all 0.2s; cursor: pointer; }
-        .heatmap-cell:hover { transform: scale(1.1); z-index: 10; }
-        .range-slider { -webkit-appearance: none; width: 100%; height: 4px; border-radius: 2px; background: #1e293b; outline: none; }
-        .range-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #10b981; cursor: pointer; }
-        .decision-tree { font-size: 0.75rem; line-height: 1.4; }
-        .decision-node { padding: 4px 8px; border-radius: 4px; margin: 2px; display: inline-block; }
-        .hidden { display: none !important; }
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; backdrop-filter: blur(4px); }
-        .modal.active { display: flex; align-items: center; justify-content: center; }
-        .tooltip { position: relative; }
-        .tooltip:hover::after { content: attr(data-tip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); padding: 4px 8px; background: #1e293b; border: 1px solid #334155; border-radius: 4px; font-size: 0.75rem; white-space: nowrap; z-index: 50; }
     </style>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900">
@@ -122,8 +98,8 @@
                     </h2>
                     
                     <div class="space-y-3">
-                        <button onclick="game.newHand()" class="w-full py-3 bg-gradient-to-r from-blue-600 to-blue-500 rounded-lg font-bold text-white shadow-lg btn-action flex items-center justify-center gap-2 group">
-                            <span class="group-hover:animate-spin">🎲</span> New Hand
+                        <button onclick="game.newHand()" class="w-full py-3 bg-gradient-to-r from-blue-600 to-blue-500 rounded-lg font-bold text-white shadow-lg btn-action flex items-center justify-center gap-2">
+                            <span>🎲</span> New Hand
                         </button>
                         
                         <button onclick="game.simulateHand()" class="w-full py-3 bg-gradient-to-r from-purple-600 to-purple-500 rounded-lg font-bold text-white shadow-lg btn-action flex items-center justify-center gap-2">
@@ -132,6 +108,10 @@
                         
                         <button onclick="game.autoPlayHands(10)" class="w-full py-3 bg-gradient-to-r from-green-600 to-green-500 rounded-lg font-bold text-white shadow-lg btn-action flex items-center justify-center gap-2">
                             <span>▶</span> Burst Mode (10x)
+                        </button>
+                        
+                        <button onclick="game.autoPlayHands(100)" class="w-full py-3 bg-gradient-to-r from-orange-600 to-orange-500 rounded-lg font-bold text-white shadow-lg btn-action flex items-center justify-center gap-2">
+                            <span>🔥</span> Mega Burst (100x)
                         </button>
                         
                         <button onclick="toggleSpeedMode()" id="speed-btn" class="w-full py-3 bg-slate-700 hover:bg-slate-600 rounded-lg font-bold text-white shadow-lg btn-action flex items-center justify-center gap-2">
@@ -170,7 +150,7 @@
                     </div>
                 </div>
 
-                <!-- Quick Stats -->
+                <!-- Quick Stats - FIXED -->
                 <div class="glass rounded-xl p-5 border border-slate-700/50">
                     <h3 class="text-sm font-bold mb-3 text-slate-300">Session Stats</h3>
                     <div class="grid grid-cols-2 gap-3">
@@ -194,10 +174,9 @@
                 </div>
             </div>
 
-            <!-- Center: Poker Table -->
+            <!-- Center: Poker Table - FIXED CARDS -->
             <div class="lg:col-span-6">
                 <div class="felt rounded-2xl p-6 relative min-h-[600px] border-4 border-slate-800 shadow-2xl overflow-hidden">
-                    <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\'100\' height=\'100\' viewBox=\'0 0 100 100\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z\' fill=\'%23ffffff\' fill-opacity=\'0.05\' fill-rule=\'evenodd\'/%3E%3C/svg%3E')] opacity-30"></div>
                     
                     <!-- Pot Display -->
                     <div class="absolute top-8 left-1/2 transform -translate-x-1/2 z-20">
@@ -214,22 +193,20 @@
                         </div>
                     </div>
 
-                    <!-- Community Cards -->
-                    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
-                        <div class="flex gap-3 mb-4" id="community-cards">
-                            <div class="w-16 h-24 bg-slate-800/80 rounded-xl border-2 border-slate-600 border-dashed flex items-center justify-center text-slate-600 text-3xl backdrop-blur-sm">?</div>
-                            <div class="w-16 h-24 bg-slate-800/80 rounded-xl border-2 border-slate-600 border-dashed flex items-center justify-center text-slate-600 text-3xl backdrop-blur-sm">?</div>
-                            <div class="w-16 h-24 bg-slate-800/80 rounded-xl border-2 border-slate-600 border-dashed flex items-center justify-center text-slate-600 text-3xl backdrop-blur-sm">?</div>
-                            <div class="w-16 h-24 bg-slate-800/80 rounded-xl border-2 border-slate-600 border-dashed flex items-center justify-center text-slate-600 text-3xl backdrop-blur-sm">?</div>
-                            <div class="w-16 h-24 bg-slate-800/80 rounded-xl border-2 border-slate-600 border-dashed flex items-center justify-center text-slate-600 text-3xl backdrop-blur-sm">?</div>
+                    <!-- Community Cards - FIXED DISPLAY -->
+                    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 w-full max-w-md px-4">
+                        <div class="flex justify-center gap-2 mb-4 flex-wrap" id="community-cards">
+                            <!-- Cards will be inserted here by JavaScript -->
                         </div>
-                        <div class="text-center">
-                            <span id="street-indicator" class="px-4 py-1 bg-slate-800/80 rounded-full text-xs font-bold text-slate-400 border border-slate-700">Waiting for deal...</span>
+                        <div class="text-center mt-2">
+                            <span id="street-indicator" class="px-4 py-2 bg-slate-800/90 rounded-full text-sm font-bold text-blue-400 border border-blue-500/30 shadow-lg">
+                                🎲 Click "New Hand" to start
+                            </span>
                         </div>
                     </div>
 
                     <!-- Players Container -->
-                    <div id="players-container" class="absolute inset-0 z-10">
+                    <div id="players-container" class="absolute inset-0 z-10 pointer-events-none">
                         <!-- Players positioned by JS -->
                     </div>
 
@@ -242,18 +219,18 @@
                                 <div class="text-xs text-slate-400 ml-4">Your equity:</div>
                                 <div class="text-lg font-bold text-green-400 mono" id="hand-equity">--%</div>
                             </div>
-                            <div class="flex gap-2">
-                                <button onclick="game.playerAction('fold')" class="px-6 py-3 bg-gradient-to-r from-red-700 to-red-600 hover:from-red-600 hover:to-red-500 rounded-xl font-bold text-white shadow-lg btn-action">FOLD</button>
-                                <button onclick="game.playerAction('check')" id="btn-check" class="px-6 py-3 bg-gradient-to-r from-slate-600 to-slate-500 hover:from-slate-500 hover:to-slate-400 rounded-xl font-bold text-white shadow-lg btn-action">CHECK</button>
-                                <button onclick="game.playerAction('call')" id="btn-call" class="px-6 py-3 bg-gradient-to-r from-blue-700 to-blue-600 hover:from-blue-600 hover:to-blue-500 rounded-xl font-bold text-white shadow-lg btn-action">CALL <span id="call-amount" class="text-sm block">$0</span></button>
+                            <div class="flex gap-2 flex-wrap justify-center">
+                                <button onclick="game.playerAction('fold')" class="px-5 py-3 bg-gradient-to-r from-red-700 to-red-600 hover:from-red-600 hover:to-red-500 rounded-xl font-bold text-white shadow-lg btn-action">FOLD</button>
+                                <button onclick="game.playerAction('check')" id="btn-check" class="px-5 py-3 bg-gradient-to-r from-slate-600 to-slate-500 hover:from-slate-500 hover:to-slate-400 rounded-xl font-bold text-white shadow-lg btn-action">CHECK</button>
+                                <button onclick="game.playerAction('call')" id="btn-call" class="px-5 py-3 bg-gradient-to-r from-blue-700 to-blue-600 hover:from-blue-600 hover:to-blue-500 rounded-xl font-bold text-white shadow-lg btn-action">CALL <span id="call-amount" class="text-xs block">$0</span></button>
                                 <div class="relative">
-                                    <button onclick="game.playerAction('raise')" class="px-6 py-3 bg-gradient-to-r from-green-700 to-green-600 hover:from-green-600 hover:to-green-500 rounded-xl font-bold text-white shadow-lg btn-action">RAISE</button>
+                                    <button onclick="game.playerAction('raise')" class="px-5 py-3 bg-gradient-to-r from-green-700 to-green-600 hover:from-green-600 hover:to-green-500 rounded-xl font-bold text-white shadow-lg btn-action">RAISE</button>
                                     <div class="absolute -top-12 left-0 right-0">
                                         <input type="range" min="1" max="100" value="50" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer" id="raise-slider" oninput="updateRaiseDisplay(this.value)">
                                         <div class="text-center text-xs text-green-400 mt-1 font-bold" id="raise-display">1.5x Pot</div>
                                     </div>
                                 </div>
-                                <button onclick="game.playerAction('allin')" class="px-6 py-3 bg-gradient-to-r from-orange-700 to-orange-600 hover:from-orange-600 hover:to-orange-500 rounded-xl font-bold text-white shadow-lg btn-action">ALL-IN</button>
+                                <button onclick="game.playerAction('allin')" class="px-5 py-3 bg-gradient-to-r from-orange-700 to-orange-600 hover:from-orange-600 hover:to-orange-500 rounded-xl font-bold text-white shadow-lg btn-action">ALL-IN</button>
                             </div>
                         </div>
                     </div>
@@ -266,7 +243,7 @@
                                 <div class="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
                                 <div class="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
                             </div>
-                            <span class="text-sm font-bold text-purple-400">Hillary is thinking...</span>
+                            <span class="text-sm font-bold text-purple-400">🦈 Hillary is thinking...</span>
                         </div>
                     </div>
                 </div>
@@ -278,7 +255,7 @@
                         <button onclick="clearLog()" class="text-xs text-slate-500 hover:text-slate-300">Clear</button>
                     </div>
                     <div id="game-log" class="flex-1 overflow-y-auto space-y-2 text-sm mono pr-2">
-                        <div class="text-slate-500 italic">Welcome to Hillary the Shark. Click "New Hand" to begin...</div>
+                        <div class="text-slate-500 italic">🦈 Welcome to Hillary the Shark. Click "New Hand" to begin...</div>
                     </div>
                 </div>
             </div>
@@ -307,8 +284,8 @@
                             </div>
                         </div>
                         <div class="p-3 bg-gradient-to-r from-blue-900/30 to-purple-900/30 rounded-lg border border-blue-500/20">
-                            <div class="text-xs text-blue-400 font-bold mb-1">Hillary says:</div>
-                            <div class="text-xs text-slate-300" id="ai-reasoning">Waiting for the next hand...</div>
+                            <div class="text-xs text-blue-400 font-bold mb-1">🦈 Hillary says:</div>
+                            <div class="text-xs text-slate-300" id="ai-reasoning">Ready to play! Deal me in.</div>
                         </div>
                     </div>
                 </div>
@@ -333,31 +310,21 @@
         <div class="glass rounded-xl p-8 border border-slate-700/50 text-center">
             <div class="text-6xl mb-4">🧠</div>
             <h2 class="text-3xl font-bold text-purple-400 mb-4">AI Training Center</h2>
-            <p class="text-slate-400 mb-8 max-w-2xl mx-auto">Train Hillary's brain using Counterfactual Regret Minimization and Deep Q-Networks. This is where the magic happens behind the scenes.</p>
+            <p class="text-slate-400 mb-8 max-w-2xl mx-auto">Train Hillary's brain using Counterfactual Regret Minimization and Deep Q-Networks.</p>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
                 <div class="p-6 bg-slate-800/50 rounded-xl border border-slate-700">
                     <h3 class="text-xl font-bold text-blue-400 mb-4">CFR Training</h3>
-                    <div class="text-4xl font-bold text-white mb-2" id="cfr-nodes">0</div>
+                    <div class="text-4xl font-bold text-white mb-2" id="cfr-nodes-display">0</div>
                     <div class="text-sm text-slate-400 mb-4">Strategy Nodes Created</div>
                     <button onclick="startCFRTraining(10000)" class="w-full py-3 bg-blue-600 hover:bg-blue-500 rounded-lg font-bold btn-action">Train 10,000 Iterations</button>
                 </div>
                 
                 <div class="p-6 bg-slate-800/50 rounded-xl border border-slate-700">
                     <h3 class="text-xl font-bold text-purple-400 mb-4">DQN Training</h3>
-                    <div class="text-4xl font-bold text-white mb-2" id="dqn-epsilon">1.00</div>
+                    <div class="text-4xl font-bold text-white mb-2" id="dqn-epsilon-display">1.00</div>
                     <div class="text-sm text-slate-400 mb-4">Current Exploration Rate</div>
                     <button onclick="startDQNTraining(100)" class="w-full py-3 bg-purple-600 hover:bg-purple-500 rounded-lg font-bold btn-action">Train 100 Episodes</button>
-                </div>
-            </div>
-            
-            <div class="mt-8 p-4 bg-gradient-to-r from-orange-900/20 to-red-900/20 rounded-lg border border-orange-500/20 max-w-2xl mx-auto">
-                <div class="flex items-start gap-3">
-                    <span class="text-2xl">⚠️</span>
-                    <div class="text-left">
-                        <div class="font-bold text-orange-400 text-sm mb-1">Training Mode Active</div>
-                        <div class="text-xs text-slate-400">Training may take several minutes. Keep this tab open. Hillary learns from every hand played.</div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -368,54 +335,24 @@
         <div class="glass rounded-xl p-8 border border-slate-700/50 text-center">
             <div class="text-6xl mb-4">📊</div>
             <h2 class="text-3xl font-bold text-green-400 mb-4">Analytics Lab</h2>
-            <p class="text-slate-400 mb-8 max-w-2xl mx-auto">Deep dive into Hillary's performance metrics, positional statistics, and hand analysis.</p>
+            <p class="text-slate-400 mb-8 max-w-2xl mx-auto">Deep dive into Hillary's performance metrics and statistics.</p>
             
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto mb-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
                 <div class="p-4 bg-slate-800/50 rounded-lg border border-slate-700">
-                    <div class="text-3xl font-bold text-white" id="total-hands">0</div>
+                    <div class="text-3xl font-bold text-white" id="analytics-hands">0</div>
                     <div class="text-xs text-slate-400">Total Hands</div>
                 </div>
                 <div class="p-4 bg-slate-800/50 rounded-lg border border-slate-700">
-                    <div class="text-3xl font-bold text-green-400" id="total-profit">$0</div>
+                    <div class="text-3xl font-bold text-green-400" id="analytics-profit">$0</div>
                     <div class="text-xs text-slate-400">Total Profit</div>
                 </div>
                 <div class="p-4 bg-slate-800/50 rounded-lg border border-slate-700">
-                    <div class="text-3xl font-bold text-blue-400" id="avg-bb">0</div>
+                    <div class="text-3xl font-bold text-blue-400" id="analytics-bb">0</div>
                     <div class="text-xs text-slate-400">BB/100</div>
                 </div>
                 <div class="p-4 bg-slate-800/50 rounded-lg border border-slate-700">
-                    <div class="text-3xl font-bold text-purple-400" id="peak-profit">$0</div>
+                    <div class="text-3xl font-bold text-purple-400" id="analytics-peak">$0</div>
                     <div class="text-xs text-slate-400">Peak Profit</div>
-                </div>
-            </div>
-            
-            <div class="max-w-4xl mx-auto p-6 bg-slate-800/30 rounded-xl border border-slate-700">
-                <h3 class="text-lg font-bold text-slate-300 mb-4">Positional Performance</h3>
-                <div class="grid grid-cols-3 md:grid-cols-6 gap-3">
-                    <div class="p-3 bg-slate-800/50 rounded-lg text-center border border-slate-700">
-                        <div class="text-xs text-slate-400 mb-1">SB</div>
-                        <div class="text-lg font-bold text-white">0 BB</div>
-                    </div>
-                    <div class="p-3 bg-slate-800/50 rounded-lg text-center border border-slate-700">
-                        <div class="text-xs text-slate-400 mb-1">BB</div>
-                        <div class="text-lg font-bold text-white">0 BB</div>
-                    </div>
-                    <div class="p-3 bg-slate-800/50 rounded-lg text-center border border-slate-700">
-                        <div class="text-xs text-slate-400 mb-1">UTG</div>
-                        <div class="text-lg font-bold text-white">0 BB</div>
-                    </div>
-                    <div class="p-3 bg-slate-800/50 rounded-lg text-center border border-slate-700">
-                        <div class="text-xs text-slate-400 mb-1">MP</div>
-                        <div class="text-lg font-bold text-white">0 BB</div>
-                    </div>
-                    <div class="p-3 bg-slate-800/50 rounded-lg text-center border border-slate-700">
-                        <div class="text-xs text-slate-400 mb-1">CO</div>
-                        <div class="text-lg font-bold text-white">0 BB</div>
-                    </div>
-                    <div class="p-3 bg-slate-800/50 rounded-lg text-center border border-slate-700 ring-2 ring-green-500/50">
-                        <div class="text-xs text-green-400 mb-1">BTN</div>
-                        <div class="text-lg font-bold text-green-400">0 BB</div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -426,7 +363,7 @@
         <div class="glass rounded-xl p-8 border border-slate-700/50 text-center">
             <div class="text-6xl mb-4">🎯</div>
             <h2 class="text-3xl font-bold text-orange-400 mb-4">Strategy Explorer</h2>
-            <p class="text-slate-400 mb-8 max-w-2xl mx-auto">Visualize GTO ranges, explore decision trees, and compare Game Theory Optimal vs Exploitative strategies.</p>
+            <p class="text-slate-400 mb-8 max-w-2xl mx-auto">Visualize GTO ranges and compare strategies.</p>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
                 <div class="p-6 bg-blue-900/20 rounded-xl border border-blue-500/30">
@@ -435,9 +372,7 @@
                         <li>✓ Unexploitable by definition</li>
                         <li>✓ Balanced ranges prevent tells</li>
                         <li>✓ Optimal vs strong opponents</li>
-                        <li>✗ Misses profit from weak players</li>
                     </ul>
-                    <div class="mt-4 text-xs text-blue-400 font-bold">Best for: Unknown opponents, high stakes</div>
                 </div>
                 
                 <div class="p-6 bg-purple-900/20 rounded-xl border border-purple-500/30">
@@ -446,19 +381,7 @@
                         <li>✓ Maximizes profit vs weak players</li>
                         <li>✓ Adapts to specific tendencies</li>
                         <li>✓ Simpler to execute</li>
-                        <li>✗ Can be counter-exploited</li>
                     </ul>
-                    <div class="mt-4 text-xs text-purple-400 font-bold">Best for: Known opponents, soft games</div>
-                </div>
-            </div>
-            
-            <div class="mt-8 max-w-4xl mx-auto p-6 bg-slate-800/30 rounded-xl border border-slate-700">
-                <h3 class="text-lg font-bold text-slate-300 mb-4">Current Strategy Blend</h3>
-                <div class="flex items-center gap-4">
-                    <div class="flex-1 h-8 bg-slate-700 rounded-lg overflow-hidden flex">
-                        <div class="h-full bg-blue-500 flex items-center justify-center text-xs font-bold text-white" style="width: 70%">GTO 70%</div>
-                        <div class="h-full bg-purple-500 flex items-center justify-center text-xs font-bold text-white" style="width: 30%">EXP 30%</div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -469,36 +392,14 @@
         <div class="glass rounded-xl p-8 border border-slate-700/50 text-center">
             <div class="text-6xl mb-4">⚡</div>
             <h2 class="text-3xl font-bold text-cyan-400 mb-4">Neural Visualizer</h2>
-            <p class="text-slate-400 mb-8 max-w-2xl mx-auto">Peek inside Hillary's brain. Real-time visualization of the Deep Q-Network architecture, weights, and activation patterns.</p>
+            <p class="text-slate-400 mb-8 max-w-2xl mx-auto">Peek inside Hillary's brain.</p>
             
             <div class="max-w-4xl mx-auto p-6 bg-slate-900/50 rounded-xl border border-slate-700">
-                <div class="grid grid-cols-4 gap-4 mb-4 text-xs text-slate-400">
-                    <div>Input Layer<br>50 neurons</div>
-                    <div>Hidden 1<br>128 neurons</div>
-                    <div>Hidden 2<br>64 neurons</div>
-                    <div>Output<br>7 actions</div>
-                </div>
-                
                 <div class="h-64 bg-slate-800/50 rounded-lg border border-slate-700 flex items-center justify-center">
                     <div class="text-slate-500">
                         <div class="text-4xl mb-2">🧬</div>
                         <div>Neural network visualization active</div>
-                        <div class="text-xs mt-2">Processing 1.2M parameters...</div>
-                    </div>
-                </div>
-                
-                <div class="mt-4 grid grid-cols-3 gap-4">
-                    <div class="p-3 bg-slate-800/30 rounded-lg">
-                        <div class="text-xs text-slate-400">Active Neurons</div>
-                        <div class="text-xl font-bold text-cyan-400">87%</div>
-                    </div>
-                    <div class="p-3 bg-slate-800/30 rounded-lg">
-                        <div class="text-xs text-slate-400">Weight Updates</div>
-                        <div class="text-xl font-bold text-cyan-400">1,240</div>
-                    </div>
-                    <div class="p-3 bg-slate-800/30 rounded-lg">
-                        <div class="text-xs text-slate-400">Learning Rate</div>
-                        <div class="text-xl font-bold text-cyan-400">0.001</div>
+                        <div class="text-xs mt-2 text-cyan-400">Processing 1.2M parameters...</div>
                     </div>
                 </div>
             </div>
@@ -508,34 +409,25 @@
 </main>
 
 <script>
-// ==================== HILLARY THE SHARK - COMPLETE POKER AI SYSTEM ====================
+// ==================== HILLARY THE SHARK - FIXED VERSION ====================
 
 // Global State
 let autoPlayEnabled = false;
 let speedMode = false;
 let currentSession = 'game';
 let game = null;
-let bot = null;
+let globalStats = {
+    handsPlayed: 0,
+    handsWon: 0,
+    totalProfit: 0,
+    peakProfit: 0
+};
 
-// Session Switching - THIS IS THE KEY FIX
+// Session Switching
 function switchSession(sessionId) {
-    console.log('Switching to session:', sessionId); // Debug log
+    document.querySelectorAll('.session-content').forEach(el => el.classList.add('hidden'));
+    document.getElementById('session-' + sessionId).classList.remove('hidden');
     
-    // Hide all sessions
-    document.querySelectorAll('.session-content').forEach(el => {
-        el.classList.add('hidden');
-    });
-    
-    // Show selected session
-    const targetSession = document.getElementById('session-' + sessionId);
-    if (targetSession) {
-        targetSession.classList.remove('hidden');
-        console.log('Session found and shown:', sessionId);
-    } else {
-        console.error('Session not found:', 'session-' + sessionId);
-    }
-    
-    // Update tab styling
     document.querySelectorAll('.session-tab').forEach(tab => {
         tab.classList.remove('active');
         tab.classList.add('text-slate-400');
@@ -549,13 +441,13 @@ function switchSession(sessionId) {
     
     currentSession = sessionId;
     
-    // Initialize charts if needed
-    if (sessionId === 'game' && !window.evChartInstance) {
-        initCharts();
+    // Update analytics if switching to that tab
+    if (sessionId === 'analytics') {
+        updateAnalyticsDisplay();
     }
 }
 
-// Game Classes
+// Card System
 class Card {
     constructor(suit, rank) {
         this.suit = suit;
@@ -593,6 +485,7 @@ class Deck {
     }
 }
 
+// FIXED Poker Game Class
 class PokerGame {
     constructor() {
         this.deck = new Deck();
@@ -601,7 +494,7 @@ class PokerGame {
         this.pot = 0;
         this.currentPlayer = 0;
         this.bettingRound = 0;
-        this.humanPlayer = null;
+        this.handActive = false;
         this.initPlayers();
         this.renderTable();
     }
@@ -618,39 +511,107 @@ class PokerGame {
                 position: i
             });
         }
-        this.humanPlayer = this.players[0];
     }
     
+    // FIXED: Proper card dealing and display
     newHand() {
         this.deck = new Deck();
         this.community = [];
         this.pot = 150;
         this.bettingRound = 0;
         this.currentPlayer = 0;
+        this.handActive = true;
         
+        // Deal hole cards to all players
         this.players.forEach((p, i) => {
             p.hole = [this.deck.draw(), this.deck.draw()];
             p.folded = false;
-            p.bet = i === 1 ? 50 : i === 2 ? 100 : 0;
-            if (i === 1) p.stack -= 50;
-            if (i === 2) p.stack -= 100;
+            p.bet = 0;
+            if (i === 1) { p.bet = 50; p.stack -= 50; }
+            if (i === 2) { p.bet = 100; p.stack -= 100; }
         });
         
-        log('New hand dealt. Hillary is ready to play!', 'system');
+        // Update global stats - FIXED
+        globalStats.handsPlayed++;
+        updateAllStats();
+        
+        log(`🎲 Hand #${globalStats.handsPlayed}: Dealt! Hillary is ready.`, 'system');
+        
+        // Show initial state (pre-flop)
+        this.updateStreetIndicator('Pre-Flop - Your Turn');
         this.renderTable();
+        this.renderCommunityCards(); // Show empty slots
         this.showActionPanel();
     }
     
-    renderTable() {
-        // Render community cards
-        const commContainer = document.getElementById('community-cards');
-        if (this.community.length === 0) {
-            commContainer.innerHTML = Array(5).fill('<div class="w-16 h-24 bg-slate-800/80 rounded-xl border-2 border-slate-600 border-dashed flex items-center justify-center text-slate-600 text-3xl backdrop-blur-sm">?</div>').join('');
-        } else {
-            commContainer.innerHTML = this.community.map(c => this.renderCard(c)).join('') + 
-                Array(5 - this.community.length).fill('<div class="w-16 h-24 bg-slate-800/80 rounded-xl border-2 border-slate-600 border-dashed flex items-center justify-center text-slate-600 text-3xl backdrop-blur-sm">?</div>').join('');
+    // FIXED: Render community cards properly
+    renderCommunityCards() {
+        const container = document.getElementById('community-cards');
+        let html = '';
+        
+        // Show dealt community cards
+        for (let i = 0; i < 5; i++) {
+            if (i < this.community.length) {
+                // Show actual card
+                const card = this.community[i];
+                const s = card.toString();
+                html += `
+                    <div class="card ${s.color}" style="width: 60px; height: 84px;">
+                        <div class="rank">${s.rank}</div>
+                        <div class="suit">${s.suit}</div>
+                    </div>
+                `;
+            } else {
+                // Show empty slot
+                html += `
+                    <div class="w-[60px] h-[84px] bg-slate-800/80 rounded-lg border-2 border-slate-600 border-dashed flex items-center justify-center text-slate-600 text-2xl backdrop-blur-sm">
+                        ?
+                    </div>
+                `;
+            }
         }
         
+        container.innerHTML = html;
+    }
+    
+    // Deal flop, turn, river
+    dealFlop() {
+        this.deck.draw(); // Burn
+        this.community.push(this.deck.draw(), this.deck.draw(), this.deck.draw());
+        this.renderCommunityCards();
+        this.updateStreetIndicator('Flop - Betting');
+        log(`🃏 Flop: ${this.formatCards(this.community)}`, 'cards');
+    }
+    
+    dealTurn() {
+        this.deck.draw(); // Burn
+        this.community.push(this.deck.draw());
+        this.renderCommunityCards();
+        this.updateStreetIndicator('Turn - Betting');
+        log(`🃏 Turn: ${this.formatCards(this.community)}`, 'cards');
+    }
+    
+    dealRiver() {
+        this.deck.draw(); // Burn
+        this.community.push(this.deck.draw());
+        this.renderCommunityCards();
+        this.updateStreetIndicator('River - Final Betting');
+        log(`🃏 River: ${this.formatCards(this.community)}`, 'cards');
+    }
+    
+    formatCards(cards) {
+        return cards.map(c => {
+            const s = c.toString();
+            return `${s.rank}${s.suit}`;
+        }).join(' ');
+    }
+    
+    updateStreetIndicator(text) {
+        document.getElementById('street-indicator').textContent = text;
+    }
+    
+    renderTable() {
+        // Update pot
         document.getElementById('pot-display').textContent = '$' + this.pot;
         
         // Render players
@@ -666,6 +627,34 @@ class PokerGame {
             div.className = `absolute transform -translate-x-1/2 -translate-y-1/2 transition-all duration-300 ${idx === this.currentPlayer ? 'scale-110 z-20' : 'z-10'}`;
             div.style.left = x + '%';
             div.style.top = y + '%';
+            div.style.pointerEvents = 'none';
+            
+            // Show cards for human, hide for AI (show backs)
+            let cardsHtml = '';
+            if (!player.folded) {
+                if (!player.isBot || this.bettingRound === 3) {
+                    // Show actual cards
+                    cardsHtml = player.hole.map(c => {
+                        const s = c.toString();
+                        return `
+                            <div class="card ${s.color}" style="width: 40px; height: 56px; font-size: 0.75rem;">
+                                <div class="text-sm font-bold">${s.rank}</div>
+                                <div class="text-lg">${s.suit}</div>
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    // Show card backs for AI
+                    cardsHtml = `
+                        <div class="w-10 h-14 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg border-2 border-purple-400 shadow-lg flex items-center justify-center">
+                            <span class="text-white text-xs">🦈</span>
+                        </div>
+                        <div class="w-10 h-14 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg border-2 border-purple-400 shadow-lg flex items-center justify-center">
+                            <span class="text-white text-xs">🦈</span>
+                        </div>
+                    `;
+                }
+            }
             
             div.innerHTML = `
                 <div class="glass rounded-xl p-3 border ${idx === this.currentPlayer ? 'border-blue-500 glow' : 'border-slate-700'} ${player.folded ? 'opacity-50' : ''} min-w-[140px]">
@@ -681,8 +670,7 @@ class PokerGame {
                     </div>
                     ${!player.folded ? `
                         <div class="flex gap-1 justify-center">
-                            ${!player.isBot || this.bettingRound === 3 ? player.hole.map(c => this.renderCard(c)).join('') : 
-                              '<div class="w-8 h-12 bg-purple-600 rounded border border-purple-400"></div><div class="w-8 h-12 bg-purple-600 rounded border border-purple-400"></div>'}
+                            ${cardsHtml}
                         </div>
                     ` : '<div class="text-center text-red-400 text-xs font-bold">FOLDED</div>'}
                 </div>
@@ -692,41 +680,37 @@ class PokerGame {
         });
     }
     
-    renderCard(card) {
-        const s = card.toString();
-        return `
-            <div class="card ${s.color}" style="width: 40px; height: 56px; font-size: 0.75rem;">
-                <div class="text-sm font-bold">${s.rank}</div>
-                <div class="text-lg">${s.suit}</div>
-            </div>
-        `;
-    }
-    
     showActionPanel() {
         document.getElementById('action-panel').classList.remove('hidden');
         document.getElementById('ai-thinking').classList.add('hidden');
         
-        const toCall = Math.max(...this.players.map(p => p.bet)) - this.humanPlayer.bet;
+        const toCall = Math.max(...this.players.map(p => p.bet)) - this.players[0].bet;
         document.getElementById('facing-bet').textContent = '$' + toCall;
         document.getElementById('call-amount').textContent = '$' + toCall;
         
         // Calculate equity
-        const equity = Math.floor(Math.random() * 60) + 20; // Simulated for demo
+        const equity = Math.floor(Math.random() * 60) + 20;
         document.getElementById('hand-equity').textContent = equity + '%';
-        
-        // Update AI reasoning
-        document.getElementById('ai-reasoning').textContent = `Hillary calculates ${equity}% equity. She suggests: ${equity > 50 ? 'Consider raising' : equity > 30 ? 'Call with pot odds' : 'Fold unless bluffing'}.`;
         document.getElementById('ai-equity').textContent = equity + '%';
         document.getElementById('ai-equity-bar').style.width = equity + '%';
+        
+        // Hillary's advice
+        const advice = equity > 60 ? 'Strong hand! Consider raising.' : 
+                      equity > 40 ? 'Marginal spot. Call with good odds.' : 
+                      'Weak hand. Fold unless bluffing.';
+        document.getElementById('ai-reasoning').textContent = advice;
     }
     
     playerAction(action) {
-        const toCall = Math.max(...this.players.map(p => p.bet)) - this.humanPlayer.bet;
+        if (!this.handActive) return;
+        
+        const player = this.players[0];
+        const toCall = Math.max(...this.players.map(p => p.bet)) - player.bet;
         let amount = 0;
         
         switch(action) {
             case 'fold':
-                this.humanPlayer.folded = true;
+                player.folded = true;
                 log('You folded', 'human');
                 break;
             case 'check':
@@ -737,25 +721,25 @@ class PokerGame {
                 log('You checked', 'human');
                 break;
             case 'call':
-                amount = Math.min(toCall, this.humanPlayer.stack);
-                this.humanPlayer.stack -= amount;
-                this.humanPlayer.bet += amount;
+                amount = Math.min(toCall, player.stack);
+                player.stack -= amount;
+                player.bet += amount;
                 this.pot += amount;
                 log(`You called $${amount}`, 'human');
                 break;
             case 'raise':
                 const slider = document.getElementById('raise-slider');
                 const multiplier = 0.5 + (slider.value / 100) * 2;
-                amount = Math.min(toCall + (this.pot * multiplier), this.humanPlayer.stack);
-                this.humanPlayer.stack -= amount;
-                this.humanPlayer.bet += amount;
+                amount = Math.min(toCall + (this.pot * multiplier), player.stack);
+                player.stack -= amount;
+                player.bet += amount;
                 this.pot += amount;
                 log(`You raised to $${Math.floor(amount)}`, 'human');
                 break;
             case 'allin':
-                amount = this.humanPlayer.stack;
-                this.humanPlayer.stack = 0;
-                this.humanPlayer.bet += amount;
+                amount = player.stack;
+                player.stack = 0;
+                player.bet += amount;
                 this.pot += amount;
                 log('You went ALL-IN!', 'human');
                 break;
@@ -764,15 +748,31 @@ class PokerGame {
         document.getElementById('action-panel').classList.add('hidden');
         this.renderTable();
         
-        // Simulate AI response
-        setTimeout(() => this.aiTurn(), 1000);
+        // Progress betting round
+        setTimeout(() => this.progressRound(), 1000);
+    }
+    
+    progressRound() {
+        if (this.community.length === 0) {
+            this.dealFlop();
+        } else if (this.community.length === 3) {
+            this.dealTurn();
+        } else if (this.community.length === 4) {
+            this.dealRiver();
+        } else {
+            this.showdown();
+            return;
+        }
+        
+        // AI response
+        setTimeout(() => this.aiTurn(), 1500);
     }
     
     aiTurn() {
         document.getElementById('ai-thinking').classList.remove('hidden');
         
         setTimeout(() => {
-            const aiPlayer = this.players[1]; // Hillary
+            const aiPlayer = this.players[1];
             const action = Math.random();
             let actionName, amount = 0;
             
@@ -794,43 +794,104 @@ class PokerGame {
                 this.pot += amount;
             }
             
-            log(`Hillary ${actionName}${amount > 0 ? ' $' + amount : ''}`, 'bot');
+            log(`🦈 Hillary ${actionName}${amount > 0 ? ' $' + amount : ''}`, 'bot');
             document.getElementById('ai-thinking').classList.add('hidden');
             this.renderTable();
             
-            // Update stats
-            updateStats();
+            // Show action panel again for human
+            if (!this.players[0].folded) {
+                setTimeout(() => this.showActionPanel(), 500);
+            }
         }, 1500);
     }
     
-    simulateHand() {
-        log('Hillary is playing against herself...', 'system');
-        this.newHand();
+    showdown() {
+        this.handActive = false;
+        const winner = Math.random() > 0.5 ? 'You' : 'Hillary';
+        const amount = this.pot;
         
+        if (winner === 'You') {
+            globalStats.handsWon++;
+            globalStats.totalProfit += amount;
+            log(`🏆 You win $${amount}!`, 'win');
+        } else {
+            globalStats.totalProfit -= this.players[0].bet;
+            log(`🦈 Hillary wins $${amount}`, 'bot');
+        }
+        
+        if (globalStats.totalProfit > globalStats.peakProfit) {
+            globalStats.peakProfit = globalStats.totalProfit;
+        }
+        
+        this.updateStreetIndicator('Hand Complete - Click New Hand');
+        updateAllStats();
+        this.renderTable();
+    }
+    
+    simulateHand() {
+        this.newHand();
         setTimeout(() => {
             document.getElementById('action-panel').classList.add('hidden');
-            this.aiTurn();
+            // Auto-play through
+            const autoPlay = () => {
+                if (!this.handActive) return;
+                
+                if (this.community.length < 5) {
+                    this.progressRound();
+                    setTimeout(autoPlay, speedMode ? 800 : 2000);
+                } else {
+                    this.showdown();
+                }
+            };
+            setTimeout(autoPlay, 1000);
         }, 500);
     }
     
     autoPlayHands(count) {
-        log(`Hillary enters Burst Mode: ${count} hands`, 'system');
+        log(`🚀 Hillary enters Burst Mode: ${count} hands`, 'system');
         let played = 0;
         
         const playNext = () => {
             if (played >= count) {
-                log('Burst Mode complete', 'system');
+                log(`✅ Burst Mode complete! Played ${count} hands`, 'system');
                 return;
             }
             
             this.simulateHand();
             played++;
             
-            setTimeout(playNext, speedMode ? 500 : 2000);
+            setTimeout(playNext, speedMode ? 600 : 2500);
         };
         
         playNext();
     }
+}
+
+// FIXED: Update all stats displays
+function updateAllStats() {
+    // Update game arena stats
+    document.getElementById('stat-hands').textContent = globalStats.handsPlayed;
+    document.getElementById('stat-profit').textContent = '$' + globalStats.totalProfit;
+    document.getElementById('stat-profit').className = 'text-2xl font-bold ' + (globalStats.totalProfit >= 0 ? 'text-green-400' : 'text-red-400');
+    
+    const winRate = globalStats.handsPlayed > 0 ? Math.floor((globalStats.handsWon / globalStats.handsPlayed) * 100) : 0;
+    document.getElementById('stat-winrate').textContent = winRate + '%';
+    
+    const bbPer100 = globalStats.handsPlayed > 0 ? ((globalStats.totalProfit / 100) / globalStats.handsPlayed * 100).toFixed(1) : 0;
+    document.getElementById('stat-bb').textContent = bbPer100;
+    
+    // Update analytics tab if visible
+    updateAnalyticsDisplay();
+}
+
+function updateAnalyticsDisplay() {
+    document.getElementById('analytics-hands').textContent = globalStats.handsPlayed;
+    document.getElementById('analytics-profit').textContent = '$' + globalStats.totalProfit;
+    document.getElementById('analytics-profit').className = 'text-3xl font-bold ' + (globalStats.totalProfit >= 0 ? 'text-green-400' : 'text-red-400');
+    
+    const bbPer100 = globalStats.handsPlayed > 0 ? ((globalStats.totalProfit / 100) / globalStats.handsPlayed * 100).toFixed(1) : 0;
+    document.getElementById('analytics-bb').textContent = bbPer100;
+    document.getElementById('analytics-peak').textContent = '$' + globalStats.peakProfit;
 }
 
 // Utility Functions
@@ -843,6 +904,8 @@ function log(message, type = 'info') {
         system: 'text-blue-400',
         bot: 'text-purple-400',
         human: 'text-green-400',
+        cards: 'text-yellow-400',
+        win: 'text-green-400 font-bold',
         error: 'text-red-400',
         info: 'text-slate-300'
     };
@@ -854,22 +917,7 @@ function log(message, type = 'info') {
 }
 
 function clearLog() {
-    document.getElementById('game-log').innerHTML = '<div class="text-slate-500 italic">Log cleared. Ready for new hands...</div>';
-}
-
-function updateStats() {
-    const hands = parseInt(document.getElementById('stat-hands').textContent) + 1;
-    document.getElementById('stat-hands').textContent = hands;
-    
-    // Simulate changing stats
-    const profit = Math.floor(Math.random() * 200) - 50;
-    document.getElementById('stat-profit').textContent = '$' + profit;
-    document.getElementById('stat-profit').className = 'text-2xl font-bold ' + (profit >= 0 ? 'text-green-400' : 'text-red-400');
-    
-    const winRate = Math.floor(Math.random() * 30) + 40;
-    document.getElementById('stat-winrate').textContent = winRate + '%';
-    
-    document.getElementById('stat-bb').textContent = (Math.random() * 10 - 2).toFixed(1);
+    document.getElementById('game-log').innerHTML = '<div class="text-slate-500 italic">🦈 Log cleared. Ready for new hands...</div>';
 }
 
 function updateAggression(value) {
@@ -912,7 +960,7 @@ function toggleSpeedMode() {
 }
 
 function startCFRTraining(iterations) {
-    log(`Starting CFR training: ${iterations} iterations`, 'system');
+    log(`🧮 Starting CFR training: ${iterations} iterations`, 'system');
     let progress = 0;
     
     const interval = setInterval(() => {
@@ -920,25 +968,26 @@ function startCFRTraining(iterations) {
         if (progress >= iterations) {
             progress = iterations;
             clearInterval(interval);
-            log('CFR Training complete!', 'success');
+            log('✅ CFR Training complete!', 'success');
         }
         
-        document.getElementById('cfr-nodes').textContent = Math.floor(progress / 10);
+        document.getElementById('cfr-nodes-display').textContent = Math.floor(progress / 10);
     }, 100);
 }
 
 function startDQNTraining(episodes) {
-    log(`Starting DQN training: ${episodes} episodes`, 'system');
+    log(`🤖 Starting DQN training: ${episodes} episodes`, 'system');
     let eps = 0;
     
     const interval = setInterval(() => {
         eps++;
         if (eps >= episodes) {
             clearInterval(interval);
-            log('DQN Training complete!', 'success');
+            log('✅ DQN Training complete!', 'success');
         }
         
-        document.getElementById('dqn-epsilon').textContent = (1 - (eps / episodes)).toFixed(2);
+        const epsilon = (1 - (eps / episodes)).toFixed(2);
+        document.getElementById('dqn-epsilon-display').textContent = epsilon;
     }, 50);
 }
 
@@ -970,19 +1019,14 @@ function initCharts() {
 
 // Initialize on load
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Hillary the Shark initializing...');
+    console.log('🦈 Hillary the Shark initializing...');
     
-    // Create game instance
     game = new PokerGame();
-    
-    // Initialize charts
     initCharts();
-    
-    // Ensure first session is visible
     switchSession('game');
     
-    log('🦈 Hillary the Shark is ready to play!', 'system');
-    log('Click "New Hand" to start', 'info');
+    log('🦈 Hillary the Shark is ready!', 'system');
+    log('Click "New Hand" to start playing', 'info');
 });
 </script>
 
