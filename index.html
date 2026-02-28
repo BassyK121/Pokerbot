@@ -92,7 +92,7 @@
     <div id="session-game" class="session-content">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             
-            <!-- Left Panel -->
+            <!-- Left Panel: Game Controls -->
             <div class="lg:col-span-3 space-y-4">
                 <div class="glass rounded-xl p-5 border border-slate-700/50">
                     <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-blue-400">
@@ -103,18 +103,23 @@
                         <button onclick="game.newHand()" class="w-full py-3 bg-gradient-to-r from-blue-600 to-blue-500 rounded-lg font-bold text-white shadow-lg btn-action flex items-center justify-center gap-2">
                             <span>🎲</span> New Hand
                         </button>
+                        
                         <button onclick="game.simulateHand()" class="w-full py-3 bg-gradient-to-r from-purple-600 to-purple-500 rounded-lg font-bold text-white shadow-lg btn-action flex items-center justify-center gap-2">
                             <span>⚡</span> Simulate All AI
                         </button>
+                        
                         <button onclick="game.autoPlayHands(10)" class="w-full py-3 bg-gradient-to-r from-green-600 to-green-500 rounded-lg font-bold text-white shadow-lg btn-action flex items-center justify-center gap-2">
                             <span>▶</span> Burst Mode (10x)
                         </button>
+                        
                         <button onclick="game.autoPlayHands(100)" class="w-full py-3 bg-gradient-to-r from-orange-600 to-orange-500 rounded-lg font-bold text-white shadow-lg btn-action flex items-center justify-center gap-2">
                             <span>🔥</span> Mega Burst (100x)
                         </button>
+                        
                         <button onclick="game.autoPlayHands(1000)" class="w-full py-3 bg-gradient-to-r from-red-600 to-red-500 rounded-lg font-bold text-white shadow-lg btn-action flex items-center justify-center gap-2">
                             <span>💥</span> Ultra Burst (1000x)
                         </button>
+                        
                         <button onclick="toggleSpeedMode()" id="speed-btn" class="w-full py-3 bg-slate-700 hover:bg-slate-600 rounded-lg font-bold text-white shadow-lg btn-action flex items-center justify-center gap-2">
                             <span>🚀</span> Speed: Normal
                         </button>
@@ -122,6 +127,7 @@
 
                     <div class="mt-6 pt-6 border-t border-slate-700">
                         <label class="text-xs text-slate-400 uppercase font-bold tracking-wider mb-3 block">Bot Intelligence</label>
+                        
                         <div class="space-y-4">
                             <div>
                                 <div class="flex justify-between text-xs mb-2">
@@ -130,6 +136,7 @@
                                 </div>
                                 <input type="range" min="0" max="100" value="70" class="slider" id="cfr-weight" oninput="updateStrategyMix('cfr', this.value)">
                             </div>
+                            
                             <div>
                                 <div class="flex justify-between text-xs mb-2">
                                     <span class="text-slate-400">DQN Weight</span>
@@ -137,6 +144,7 @@
                                 </div>
                                 <input type="range" min="0" max="100" value="30" class="slider" id="dqn-weight" oninput="updateStrategyMix('dqn', this.value)">
                             </div>
+                            
                             <div>
                                 <div class="flex justify-between text-xs mb-2">
                                     <span class="text-slate-400">Aggression</span>
@@ -334,14 +342,22 @@
                     </div>
                 </div>
 
-                <!-- Quick Actions -->
+                <!-- Quick Actions Panel -->
                 <div class="mt-4 glass rounded-xl p-4 border border-slate-700/50">
                     <h3 class="font-bold text-sm text-slate-300 mb-3">⚡ Quick Actions</h3>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
-                        <button onclick="game.sitOutNextHand()" class="py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs font-bold text-white btn-action">🪑 Sit Out</button>
-                        <button onclick="game.runItTwice()" class="py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs font-bold text-white btn-action">🎲 Run It Twice</button>
-                        <button onclick="game.showLastHand()" class="py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs font-bold text-white btn-action">👁️ Show Last</button>
-                        <button onclick="game.replayHand()" class="py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs font-bold text-white btn-action">↩️ Replay</button>
+                        <button onclick="game.sitOutNextHand()" class="py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs font-bold text-white btn-action">
+                            🪑 Sit Out
+                        </button>
+                        <button onclick="game.runItTwice()" class="py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs font-bold text-white btn-action">
+                            🎲 Run It Twice
+                        </button>
+                        <button onclick="game.showLastHand()" class="py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs font-bold text-white btn-action">
+                            👁️ Show Last Hand
+                        </button>
+                        <button onclick="game.replayHand()" class="py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs font-bold text-white btn-action">
+                            ↩️ Replay Hand
+                        </button>
                     </div>
                 </div>
 
@@ -375,7 +391,7 @@
                 </div>
             </div>
 
-            <!-- Right Panel - FIXED EV GRAPH -->
+            <!-- Right Panel -->
             <div class="lg:col-span-3 space-y-4">
                 <div class="glass rounded-xl p-5 border border-slate-700/50">
                     <h3 class="text-sm font-bold mb-3 text-purple-400">🧠 AI Decision Process</h3>
@@ -416,50 +432,51 @@
                 <!-- Hot Streaks -->
                 <div class="glass rounded-xl p-5 border border-slate-700/50">
                     <h3 class="text-sm font-bold mb-3 text-red-400">🔥 Hot Streaks</h3>
-                    <div class="space-y-2" id="hot-streaks">
+                    <div class="space-y-2">
                         <div class="flex items-center gap-2 p-2 bg-slate-800/30 rounded-lg">
                             <span class="text-lg">🦈</span>
                             <div class="flex-1">
                                 <div class="text-xs font-bold text-blue-400">Hillary</div>
-                                <div class="text-xs text-slate-400">Waiting for first win...</div>
+                                <div class="text-xs text-slate-400">Won last 3 hands</div>
                             </div>
+                            <div class="text-xs text-red-400 font-bold">🔥 x3</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- FIXED: Compact EV Analysis Graph -->
+                <!-- FIXED: Compact EV Analysis -->
                 <div class="glass rounded-xl p-4 border border-slate-700/50">
                     <div class="flex justify-between items-center mb-3">
                         <h3 class="text-sm font-bold text-green-400">📈 EV Analysis</h3>
-                        <span class="text-xs px-2 py-1 bg-green-500/20 text-green-400 rounded-full" id="ev-status">LIVE</span>
+                        <span class="text-xs text-slate-400" id="ev-status">Live</span>
                     </div>
                     
-                    <!-- Compact Chart Container -->
-                    <div class="h-32 mb-3 bg-slate-800/30 rounded-lg p-2">
+                    <!-- Compact Chart -->
+                    <div class="h-32 mb-3">
                         <canvas id="evChart"></canvas>
                     </div>
                     
-                    <!-- Key Metrics Row -->
+                    <!-- Key Metrics -->
                     <div class="grid grid-cols-3 gap-2 mb-3">
-                        <div class="text-center p-2 bg-slate-800/50 rounded-lg border border-slate-700">
-                            <div class="text-xs text-slate-400 mb-1">Current</div>
+                        <div class="text-center p-2 bg-slate-800/50 rounded-lg">
+                            <div class="text-xs text-slate-400">Current</div>
                             <div class="text-sm font-bold text-green-400" id="ev-current">+$0</div>
                         </div>
-                        <div class="text-center p-2 bg-slate-800/50 rounded-lg border border-slate-700">
-                            <div class="text-xs text-slate-400 mb-1">Per Hand</div>
+                        <div class="text-center p-2 bg-slate-800/50 rounded-lg">
+                            <div class="text-xs text-slate-400">Avg/Hand</div>
                             <div class="text-sm font-bold text-blue-400" id="ev-avg">$0</div>
                         </div>
-                        <div class="text-center p-2 bg-slate-800/50 rounded-lg border border-slate-700">
-                            <div class="text-xs text-slate-400 mb-1">Trend</div>
-                            <div class="text-sm font-bold text-yellow-400" id="ev-trend">→</div>
+                        <div class="text-center p-2 bg-slate-800/50 rounded-lg">
+                            <div class="text-xs text-slate-400">Trend</div>
+                            <div class="text-sm font-bold" id="ev-trend">→</div>
                         </div>
                     </div>
                     
                     <!-- Analysis Text -->
                     <div class="p-3 bg-gradient-to-r from-green-900/20 to-blue-900/20 rounded-lg border border-green-500/20">
                         <div class="text-xs text-green-400 font-bold mb-1">🧠 Analysis:</div>
-                        <div class="text-xs text-slate-300 leading-relaxed" id="ev-analysis">
-                            Start playing to see EV analysis. Hillary is calculating optimal strategies...
+                        <div class="text-xs text-slate-300" id="ev-analysis">
+                            Waiting for data...
                         </div>
                     </div>
                 </div>
@@ -545,14 +562,13 @@
 </main>
 
 <script>
-// ==================== COMPLETE HILLARY THE SHARK SYSTEM ====================
+// ==================== HILLARY THE SHARK - COMPLETE SYSTEM ====================
 
 let autoPlayEnabled = false;
 let speedMode = false;
 let currentSession = 'game';
 let game = null;
 let sessionStartTime = Date.now();
-let evDataHistory = [];
 
 let globalStats = {
     handsPlayed: 0,
@@ -560,7 +576,7 @@ let globalStats = {
     totalProfit: 0,
     peakProfit: 0,
     showdowns: [],
-    streaks: { 'Hillary': 0, 'Gentuu': 0, 'Mohammed Dev': 0, 'You': 0 }
+    evHistory: Array(20).fill(0)
 };
 
 const CHARACTERS = {
@@ -971,10 +987,6 @@ class PokerGame {
         const winner = activePlayers[Math.floor(Math.random() * activePlayers.length)];
         const amount = this.pot;
         
-        // Update streaks
-        Object.keys(globalStats.streaks).forEach(k => globalStats.streaks[k] = 0);
-        globalStats.streaks[winner.id]++;
-        
         const showdown = {
             hand: globalStats.handsPlayed,
             winner: winner.id,
@@ -985,7 +997,6 @@ class PokerGame {
         globalStats.showdowns.unshift(showdown);
         if (globalStats.showdowns.length > 5) globalStats.showdowns.pop();
         updateRecentShowdowns();
-        updateHotStreaks();
         
         if (winner.id === 'You') {
             globalStats.handsWon++;
@@ -1043,8 +1054,14 @@ class PokerGame {
         playNext();
     }
     
-    sitOutNextHand() { log('🪑 You will sit out next hand', 'system'); }
-    runItTwice() { log('🎲 Run it twice requested', 'system'); }
+    sitOutNextHand() {
+        log('🪑 You will sit out next hand', 'system');
+    }
+    
+    runItTwice() {
+        log('🎲 Run it twice requested', 'system');
+    }
+    
     showLastHand() {
         if (this.lastHand) {
             log(`👁️ Last hand: ${this.lastHand.winner} won $${this.lastHand.pot}`, 'system');
@@ -1052,9 +1069,12 @@ class PokerGame {
             log('No previous hand to show', 'error');
         }
     }
+    
     replayHand() {
         log('↩️ Replaying last hand...', 'system');
-        if (this.lastHand) this.simulateHand();
+        if (this.lastHand) {
+            this.simulateHand();
+        }
     }
     
     startSessionTimer() {
@@ -1068,12 +1088,16 @@ class PokerGame {
     }
 }
 
-// FIXED EV Chart Functions
+// FIXED: Compact EV Chart Functions
 function initCharts() {
     const ctx = document.getElementById('evChart').getContext('2d');
     
-    // Initialize with 20 data points
-    evDataHistory = Array(20).fill(0).map((_, i) => (Math.random() - 0.5) * 20);
+    // Generate initial data
+    const dataPoints = Array(20).fill(0).map((_, i) => {
+        return Math.sin(i * 0.5) * 10 + Math.random() * 5;
+    });
+    
+    globalStats.evHistory = dataPoints;
     
     window.evChartInstance = new Chart(ctx, {
         type: 'line',
@@ -1081,7 +1105,7 @@ function initCharts() {
             labels: Array(20).fill('').map((_, i) => i + 1),
             datasets: [{
                 label: 'EV',
-                data: evDataHistory,
+                data: dataPoints,
                 borderColor: '#10b981',
                 backgroundColor: (context) => {
                     const ctx = context.chart.ctx;
@@ -1092,7 +1116,7 @@ function initCharts() {
                 },
                 fill: true,
                 tension: 0.4,
-                pointRadius: 0,
+                pointRadius: 2,
                 pointHoverRadius: 4,
                 borderWidth: 2
             }]
@@ -1104,21 +1128,24 @@ function initCharts() {
                 legend: { display: false },
                 tooltip: {
                     callbacks: {
-                        label: (context) => `EV: $${context.parsed.y.toFixed(1)}`
+                        label: (context) => `EV: $${context.parsed.y.toFixed(2)}`
                     }
                 }
             },
             scales: {
                 y: { 
-                    display: true,
+                    beginAtZero: true,
                     ticks: { 
                         color: '#64748b',
-                        font: { size: 9 },
-                        callback: (value) => '$' + Math.round(value)
+                        font: { size: 10 },
+                        callback: (value) => '$' + value
                     },
                     grid: { color: 'rgba(100, 116, 139, 0.1)' }
                 },
-                x: { display: false }
+                x: { 
+                    display: false,
+                    grid: { display: false }
+                }
             },
             interaction: {
                 intersect: false,
@@ -1127,35 +1154,33 @@ function initCharts() {
         }
     });
     
-    updateEVAnalysis(evDataHistory);
+    updateEVAnalysis(dataPoints);
 }
 
 function updateEVChart() {
     if (!window.evChartInstance) return;
     
-    // Calculate new EV point based on performance
-    const lastValue = evDataHistory[evDataHistory.length - 1];
-    const profitChange = globalStats.totalProfit / Math.max(globalStats.handsPlayed, 1);
-    const volatility = (Math.random() - 0.5) * 15;
-    const newValue = lastValue * 0.8 + profitChange * 0.1 + volatility;
+    const chart = window.evChartInstance;
+    const data = chart.data.datasets[0].data;
     
-    // Shift data
-    evDataHistory.shift();
-    evDataHistory.push(newValue);
+    // Calculate new EV based on performance
+    const lastValue = data[data.length - 1];
+    const profitChange = globalStats.totalProfit / 100;
+    const newValue = lastValue + (Math.random() - 0.4) * 8 + profitChange;
     
-    // Update chart
-    window.evChartInstance.data.datasets[0].data = evDataHistory;
-    window.evChartInstance.update('none');
+    // Shift data (rolling window)
+    data.shift();
+    data.push(newValue);
     
-    // Update analysis
-    updateEVAnalysis(evDataHistory);
+    chart.update('none');
+    updateEVAnalysis(data);
 }
 
 function updateEVAnalysis(data) {
     const current = data[data.length - 1];
     const avg = data.reduce((a, b) => a + b, 0) / data.length;
-    const firstHalf = data.slice(0, 10);
-    const secondHalf = data.slice(10);
+    const firstHalf = data.slice(0, Math.floor(data.length / 2));
+    const secondHalf = data.slice(Math.floor(data.length / 2));
     const firstAvg = firstHalf.reduce((a, b) => a + b, 0) / firstHalf.length;
     const secondAvg = secondHalf.reduce((a, b) => a + b, 0) / secondHalf.length;
     
@@ -1166,31 +1191,181 @@ function updateEVAnalysis(data) {
     
     document.getElementById('ev-avg').textContent = '$' + avg.toFixed(1);
     
-    // Trend
+    // Determine trend
     let trendSymbol = '→';
     let trendColor = 'text-yellow-400';
-    let trendText = 'Stable';
     
-    if (secondAvg > firstAvg * 1.15) {
+    if (secondAvg > firstAvg * 1.1) {
         trendSymbol = '↗';
         trendColor = 'text-green-400';
-        trendText = 'Rising';
-    } else if (secondAvg < firstAvg * 0.85) {
+    } else if (secondAvg < firstAvg * 0.9) {
         trendSymbol = '↘';
         trendColor = 'text-red-400';
-        trendText = 'Falling';
     }
     
     const trendEl = document.getElementById('ev-trend');
     trendEl.textContent = trendSymbol;
     trendEl.className = 'text-sm font-bold ' + trendColor;
     
-    // Analysis text
+    // Generate analysis text
     let analysis = '';
-    const profit = globalStats.totalProfit;
-    const hands = globalStats.handsPlayed;
+    if (current > avg * 1.5 && current > 0) {
+        analysis = `🔥 Running hot! EV (+$${current.toFixed(0)}) is ${((current/avg)*100).toFixed(0)}% above average. Consider locking in profits.`;
+    } else if (current < avg * 0.5 && current < 0) {
+        analysis = `📉 Downswing: EV is $${Math.abs(current).toFixed(0)} below average. Variance is normal - stick to GTO.`;
+    } else if (secondAvg > firstAvg * 1.2) {
+        analysis = `📈 Momentum building! EV trending up ${((secondAvg/firstAvg - 1)*100).toFixed(0)}%. Hillary's aggression paying off.`;
+    } else if (secondAvg < firstAvg * 0.8) {
+        analysis = `⚠️ Caution: Downward trend detected. Gentuu's tight play or Mohammed's variance affecting results.`;
+    } else {
+        analysis = `✅ Steady performance at $${avg.toFixed(1)}/hand. Optimal strategy execution maintained.`;
+    }
     
-    if (hands < 5) {
-        analysis = `Collecting data... Play ${5 - hands} more hands for accurate EV analysis.`;
-    } else if (current > avg * 1.3 && current > 10) {
-        analysis = `🔥 Hot run! EV (+$${current.toFixed(0)}) is ${((current/
+    document.getElementById('ev-analysis').textContent = analysis;
+}
+
+function updateAllStats() {
+    document.getElementById('stat-hands').textContent = globalStats.handsPlayed;
+    document.getElementById('stat-profit').textContent = '$' + globalStats.totalProfit;
+    document.getElementById('stat-profit').className = 'text-2xl font-bold ' + (globalStats.totalProfit >= 0 ? 'text-green-400' : 'text-red-400');
+    
+    const winRate = globalStats.handsPlayed > 0 ? Math.floor((globalStats.handsWon / globalStats.handsPlayed) * 100) : 0;
+    document.getElementById('stat-winrate').textContent = winRate + '%';
+    
+    const bbPer100 = globalStats.handsPlayed > 0 ? ((globalStats.totalProfit / 100) / globalStats.handsPlayed * 100).toFixed(1) : 0;
+    document.getElementById('stat-bb').textContent = bbPer100;
+    
+    updateAnalyticsDisplay();
+}
+
+function updateRankings() {
+    if (!game) return;
+    
+    const rankIds = {
+        'You': 'rank-you',
+        'Hillary': 'rank-hillary',
+        'Gentuu': 'rank-gentuu',
+        'Mohammed Dev': 'rank-mohammed'
+    };
+    
+    game.players.forEach(p => {
+        const el = document.getElementById(rankIds[p.id]);
+        if (el) el.textContent = p.stack;
+    });
+}
+
+function updateRecentShowdowns() {
+    const container = document.getElementById('recent-showdowns');
+    if (globalStats.showdowns.length === 0) {
+        container.innerHTML = '<div class="text-slate-500 italic text-xs">No showdowns yet...</div>';
+        return;
+    }
+    
+    container.innerHTML = globalStats.showdowns.map(s => `
+        <div class="flex items-center gap-2 p-2 bg-slate-800/30 rounded-lg text-xs">
+            <span>Hand #${s.hand}</span>
+            <span class="font-bold ${s.winner === 'You' ? 'text-green-400' : 'text-blue-400'}">${s.winnerEmoji} ${s.winner}</span>
+            <span class="text-yellow-400">+$${s.pot}</span>
+            <span class="text-slate-500 ml-auto">${s.time}</span>
+        </div>
+    `).join('');
+}
+
+function updateAnalyticsDisplay() {
+    document.getElementById('analytics-hands').textContent = globalStats.handsPlayed;
+    document.getElementById('analytics-profit').textContent = '$' + globalStats.totalProfit;
+    document.getElementById('analytics-profit').className = 'text-3xl font-bold ' + (globalStats.totalProfit >= 0 ? 'text-green-400' : 'text-red-400');
+    
+    const bbPer100 = globalStats.handsPlayed > 0 ? ((globalStats.totalProfit / 100) / globalStats.handsPlayed * 100).toFixed(1) : 0;
+    document.getElementById('analytics-bb').textContent = bbPer100;
+    document.getElementById('analytics-peak').textContent = '$' + globalStats.peakProfit;
+}
+
+function log(message, type = 'info') {
+    const logContainer = document.getElementById('game-log');
+    const entry = document.createElement('div');
+    entry.className = 'log-entry';
+    
+    const colors = {
+        system: 'text-blue-400',
+        bot: 'text-purple-400',
+        human: 'text-green-400',
+        cards: 'text-yellow-400',
+        win: 'text-green-400 font-bold',
+        error: 'text-red-400',
+        info: 'text-slate-300'
+    };
+    
+    const time = new Date().toLocaleTimeString();
+    entry.innerHTML = `<span class="text-slate-600 text-xs">[${time}]</span> <span class="${colors[type] || 'text-slate-300'}">${message}</span>`;
+    logContainer.appendChild(entry);
+    logContainer.scrollTop = logContainer.scrollHeight;
+}
+
+function clearLog() {
+    document.getElementById('game-log').innerHTML = '<div class="text-slate-500 italic">🦈 Hillary, 🐊 Gentuu, and 🦁 Mohammed Dev are waiting...</div>';
+}
+
+function updateAggression(value) {
+    document.getElementById('aggro-val').textContent = value + '%';
+}
+
+function updateStrategyMix(type, value) {
+    if (type === 'cfr') {
+        document.getElementById('cfr-weight-val').textContent = value + '%';
+        document.getElementById('dqn-weight').value = 100 - value;
+        document.getElementById('dqn-weight-val').textContent = (100 - value) + '%';
+    } else {
+        document.getElementById('dqn-weight-val').textContent = value + '%';
+        document.getElementById('cfr-weight').value = 100 - value;
+        document.getElementById('cfr-weight-val').textContent = (100 - value) + '%';
+    }
+}
+
+function updateRaiseDisplay(value) {
+    const multiplier = (0.5 + (value / 100) * 2).toFixed(1);
+    document.getElementById('raise-display').textContent = multiplier + 'x Pot';
+}
+
+function toggleAutoPlay() {
+    autoPlayEnabled = !autoPlayEnabled;
+    const btn = document.getElementById('auto-play-btn');
+    btn.textContent = autoPlayEnabled ? '🤖 Auto-Play: ON' : '🤖 Auto-Play: OFF';
+    btn.className = autoPlayEnabled ? 
+        'px-4 py-1.5 bg-gradient-to-r from-green-600 to-emerald-600 rounded-lg text-xs font-bold hover:from-green-500 hover:to-emerald-500 transition btn-action' :
+        'px-4 py-1.5 bg-gradient-to-r from-orange-600 to-red-600 rounded-lg text-xs font-bold hover:from-orange-500 hover:to-red-500 transition btn-action';
+    
+    if (autoPlayEnabled && game) {
+        game.autoPlayHands(5);
+    }
+}
+
+function toggleSpeedMode() {
+    speedMode = !speedMode;
+    document.getElementById('speed-btn').innerHTML = speedMode ? '<span>⚡</span> Speed: FAST' : '<span>🚀</span> Speed: Normal';
+}
+
+function startCFRTraining(iterations) {
+    log(`🧮 Training Hillary with CFR: ${iterations} iterations`, 'system');
+}
+
+function startDQNTraining(episodes) {
+    log(`🤖 Training neural networks: ${episodes} episodes`, 'system');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🦈 Hillary the Shark vs 🐊 Gentuu vs 🦁 Mohammed Dev');
+    
+    game = new PokerGame();
+    initCharts();
+    switchSession('game');
+    
+    log('🦈 Hillary: "Ready to dominate!"', 'system');
+    log('🐊 Gentuu: "I\'ll play tight and wait..."', 'system');
+    log('🦁 Mohammed Dev: "Let\'s gamble!"', 'system');
+    log('Click "New Hand" to start the battle!', 'info');
+});
+</script>
+
+</body>
+</html>
